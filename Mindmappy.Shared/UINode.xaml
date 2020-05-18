@@ -18,6 +18,7 @@
             VerticalAlignment="Center" 
             HorizontalAlignment="Center"
             AcceptsReturn="True"
+            TextWrapping="Wrap"
             Padding="5"
             Margin="10"
             x:Name="textBox"

@@ -63,13 +63,6 @@ namespace Mindmappy.Shared
 
             InitializeComponent();
 
-            Node.BeforeLayoutChangeEvent += (target, e) =>
-            {
-                OnPropertyChanged("Left");
-                OnPropertyChanged("Top");
-                LayoutHelpers.RouteAndLabelEdges(Graph, LayoutSettings, Node.Edges);
-            };
-
             PointerPressed += OnPointerPressed;
             PointerReleased += OnPointerReleased;
             PointerMoved += OnPointerMoved;
@@ -87,6 +80,9 @@ namespace Mindmappy.Shared
                 var p2 = new MSAGLPoint(grabPoint.X, grabPoint.Y);
                 var p3 = new MSAGLPoint(Node.Width / 2, Node.Height / 2);
                 Node.Center = p1 + p3 - p2;
+                OnPropertyChanged("Left");
+                OnPropertyChanged("Top");
+                LayoutHelpers.RouteAndLabelEdges(Graph, LayoutSettings, Graph.Edges);
             }
         }
 

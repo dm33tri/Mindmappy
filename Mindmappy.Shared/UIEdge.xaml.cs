@@ -46,61 +46,70 @@ namespace Mindmappy.Shared
 {
     public sealed partial class UIEdge : Page, INotifyPropertyChanged
     {
-        public string PathData { 
-            get {
-                ICurve curve = Edge.Curve;
+        private string GetPathData(ICurve curve)
+        {
+            if (curve is Curve)
+            {
+                List<string> result = new List<string>();
 
-                if (curve is Curve)
+                for (int i = 0; i < (curve as Curve).Segments.Count; ++i)
                 {
-                    List<string> result = new List<string>();
-
-                    foreach (ICurve segment in (curve as Curve).Segments)
+                    ICurve segment = (curve as Curve).Segments[i];
+                    if (segment is LineSegment)
                     {
-                        if (segment is LineSegment)
-                        {
-                            var s = segment as LineSegment;
-                            string data = string.Format(
-                                "M{0},{1}L{2},{3}",
-                                Math.Round(s[0].X),
-                                Math.Round(s[0].Y),
-                                Math.Round(s[1].X),
-                                Math.Round(s[1].Y)
-                            );
-                            result.Add(data);
-                        }
-                        else if (segment is CubicBezierSegment)
-                        {
-                            var s = segment as CubicBezierSegment;
-                            string data = string.Format(
-                                "M{0},{1}C{2},{3} {4},{5} {6},{7}",
-                                Math.Round(s.B(0).X),
-                                Math.Round(s.B(0).Y),
-                                Math.Round(s.B(1).X),
-                                Math.Round(s.B(1).Y),
-                                Math.Round(s.B(2).X),
-                                Math.Round(s.B(2).Y),
-                                Math.Round(s.B(3).X),
-                                Math.Round(s.B(3).Y)
-                            );
-                            result.Add(data);
-                        }
+                        var s = segment as LineSegment;
+                        string data = string.Format(
+                            "M{0},{1}L{2},{3}",
+                            Math.Round(s[0].X),
+                            Math.Round(s[0].Y),
+                            Math.Round(s[1].X),
+                            Math.Round(s[1].Y)
+                        );
+                        result.Add(data);
                     }
-
-                    return string.Join("", result);
+                    else if (segment is CubicBezierSegment)
+                    {
+                        var s = segment as CubicBezierSegment;
+                        string data = string.Format(
+                            "M{0},{1}C{2},{3} {4},{5} {6},{7}",
+                            Math.Round(s.B(0).X),
+                            Math.Round(s.B(0).Y),
+                            Math.Round(s.B(1).X),
+                            Math.Round(s.B(1).Y),
+                            Math.Round(s.B(2).X),
+                            Math.Round(s.B(2).Y),
+                            Math.Round(s.B(3).X),
+                            Math.Round(s.B(3).Y)
+                        );
+                        result.Add(data);
+                    }
                 }
-                else if (curve is LineSegment)
-                {
-                    var s = curve as LineSegment;
-                    return string.Format(
-                        "M{0},{1}L{2},{3}",
-                        Math.Round(s[0].X),
-                        Math.Round(s[0].Y),
-                        Math.Round(s[1].X),
-                        Math.Round(s[1].Y)
-                    );
-                }
 
-                return "";
+                return string.Join("", result);
+            }
+            else if (curve is LineSegment)
+            {
+                var s = curve as LineSegment;
+                return string.Format(
+                    "M{0},{1}L{2},{3}",
+                    Math.Round(s[0].X),
+                    Math.Round(s[0].Y),
+                    Math.Round(s[1].X),
+                    Math.Round(s[1].Y)
+                );
+            }
+
+            return "";
+        }
+        
+        private string pathData;
+        public string PathData
+        {
+            get => pathData;
+            set
+            {
+                pathData = value;
+                OnPropertyChanged("PathData");
             }
         }
         public Edge Edge { get; set; }
@@ -124,12 +133,16 @@ namespace Mindmappy.Shared
         {
             Parent = parent;
             Edge = edge;
+            PathData = GetPathData(edge.Curve);
 
             InitializeComponent();
 
             Edge.BeforeLayoutChangeEvent += (sender, e) =>
             {
-                OnPropertyChanged("PathData");
+                if (e.DataAfterChange is ICurve)
+                {
+                    PathData = GetPathData(e.DataAfterChange as ICurve);
+                }
             };
 
             PointerPressed += (sender, e) =>
@@ -138,7 +151,6 @@ namespace Mindmappy.Shared
             };
 
             Parent.Children.Add(this);
-
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

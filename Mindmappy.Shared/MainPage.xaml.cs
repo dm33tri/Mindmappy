@@ -85,17 +85,19 @@ namespace Mindmappy {
 
         public void DrawNodes()
         {
-            foreach (MSAGLNode node in graph.Nodes)
+            for (int i = 0; i < graph.Nodes.Count; ++i)
             {
-                new UINode(node, canvas, graph, layoutSettings);
+                new UINode(graph.Nodes[i], canvas, graph, layoutSettings);
             }
         }
 
         public void DrawEdges()
         {
-            foreach (Edge edge in graph.Edges)
+            for (
+                var enumerator = graph.Edges.GetEnumerator(); 
+                enumerator.MoveNext(); )
             {
-                new UIEdge(edge, canvas);
+                new UIEdge(enumerator.Current, canvas);
             }
         }
 
@@ -111,16 +113,15 @@ namespace Mindmappy {
             graph = GetGraph();
             layoutSettings = new FastIncrementalLayoutSettings
             {
-                RouteEdges = true,
-                NodeSeparation = 100,
+                NodeSeparation = 64,
                 AvoidOverlaps = true,
+                MinConstraintLevel = 1,
             };
             layout = new InitialLayout(graph, layoutSettings);
+            layout.SingleComponent = true;
             graph.AlgorithmData = layout;
             layout.Run();
-
             LayoutHelpers.RouteAndLabelEdges(graph, layoutSettings, graph.Edges);
-
             InitializeComponent();
 
             grid.SizeChanged += (sender, e) =>
