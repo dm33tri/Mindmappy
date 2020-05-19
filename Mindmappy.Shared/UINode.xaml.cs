@@ -15,10 +15,12 @@ using Windows.UI.Xaml.Navigation;
 using System.ComponentModel;
 using Microsoft.Msagl.Core.Layout;
 using MSAGLPoint = Microsoft.Msagl.Core.Geometry.Point;
+using MSAGLRectangle = Microsoft.Msagl.Core.Geometry.Rectangle;
 using Microsoft.Msagl.Miscellaneous;
 using Microsoft.Msagl.Layout.Incremental;
 using Microsoft.Msagl.Layout.Initial;
 using System.Diagnostics;
+using Microsoft.Msagl.Core.Geometry.Curves;
 
 namespace Mindmappy.Shared
 {
@@ -31,8 +33,6 @@ namespace Mindmappy.Shared
         public FastIncrementalLayoutSettings LayoutSettings { get; set; }
 
         private Point grabPoint;
-
-        private bool moved = false;
 
         public double Top
         {
@@ -54,6 +54,25 @@ namespace Mindmappy.Shared
             get => Node?.BoundingBox.Height ?? 100;
         }
 
+        private Point pointPos;
+        private bool active;
+        public bool Active
+        {
+            get => active;
+            set
+            {
+                active = value;
+                OnPropertyChanged("Active");
+            }
+        }
+
+        /// <summary>
+        ///  Хаки для WASM и Android, потому что события фокуса там работают иначе
+        /// </summary>
+        bool tapped;
+        bool resizing;
+        bool resetState;
+        
         public UINode(Node node, Canvas parent, GeometryGraph graph, FastIncrementalLayoutSettings settings)
         {
             Node = node;
@@ -66,15 +85,78 @@ namespace Mindmappy.Shared
             PointerPressed += OnPointerPressed;
             PointerReleased += OnPointerReleased;
             PointerMoved += OnPointerMoved;
+            Tapped += OnTapped;
+            LostFocus += OnLostFocus;
+            point.PointerPressed += Point_OnPointerPressed;
+            point.PointerReleased += Point_OnPointerReleased;
+
+            GotFocus += UINode_GotFocus;
 
             Parent.Children.Add(this);
         }
 
+        private void UINode_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (resizing)
+            {
+                Active = true;
+                rect.Visibility = Visibility.Collapsed;
+            }
+            if (tapped)
+            {
+                Active = true;
+                rect.Visibility = Visibility.Collapsed;
+                textBox.IsTabStop = true;
+                textBox.Focus(FocusState.Programmatic);
+                textBox.IsTabStop = false;
+            }
+        }
+
+        private void OnTapped(object sender, TappedRoutedEventArgs e)
+        {
+            tapped = true;
+            resetState = false;
+            Active = true;
+            rect.Visibility = Visibility.Collapsed;
+            textBox.IsTabStop = true;
+            textBox.Focus(FocusState.Programmatic);
+            textBox.IsTabStop = false;
+        }
+
+        private void Point_OnPointerReleased(object sender, PointerRoutedEventArgs e)
+        {
+            resizing = false;
+            point.ReleasePointerCapture(e.Pointer);
+        }
+
+        private void Point_OnPointerPressed(object sender, PointerRoutedEventArgs e)
+        {
+            resizing = true;
+            point.CapturePointer(e.Pointer);
+            pointPos = e.GetCurrentPoint(point).Position;
+        }
+
+        private void OnLostFocus(object sender, RoutedEventArgs e)
+        {
+            if (resetState && tapped)
+            {
+                resetState = false;
+                tapped = false;
+            }
+            else
+            {
+                resetState = true;
+            }
+
+                
+            Active = false;
+            rect.Visibility = Visibility.Visible;
+        }
+
         private void OnPointerMoved(object sender, PointerRoutedEventArgs e)
         {
-            if (PointerCaptures?.Count > 0)
+            if (!resizing && PointerCaptures?.Count > 0)
             {
-                moved = true;
                 var cursorPos = e.GetCurrentPoint(Parent).Position;
                 var p1 = new MSAGLPoint(cursorPos.X, cursorPos.Y);
                 var p2 = new MSAGLPoint(grabPoint.X, grabPoint.Y);
@@ -84,22 +166,37 @@ namespace Mindmappy.Shared
                 OnPropertyChanged("Top");
                 LayoutHelpers.RouteAndLabelEdges(Graph, LayoutSettings, Graph.Edges);
             }
+            else if (resizing)
+            {
+                var cursorPos = e.GetCurrentPoint(point).Position;
+                MSAGLPoint p1 = new MSAGLPoint(cursorPos.X, cursorPos.Y);
+                MSAGLPoint p2 = new MSAGLPoint(pointPos.X, pointPos.Y);
+                var Box = Node.BoundingBox;
+                if (Node.Width + p1.X - p2.X >= 150)
+                {
+                    Box.Right += p1.X - p2.X;
+                }
+                if (Node.Height + p1.Y - p2.Y >= 60)
+                {
+                    Box.Top += p1.Y - p2.Y;
+                }
+                Node.BoundingBox = Box;
+                OnPropertyChanged("RectWidth");
+                OnPropertyChanged("RectHeight");
+                LayoutHelpers.RouteAndLabelEdges(Graph, LayoutSettings, Graph.Edges);
+            }
         }
 
         private void OnPointerReleased(object sender, PointerRoutedEventArgs e)
         {
+            resizing = false;
             ReleasePointerCapture(e.Pointer);
-            if (moved)
-            {
-                LayoutHelpers.RouteAndLabelEdges(Graph, LayoutSettings, Graph.Edges);
-            }
         }
 
         private void OnPointerPressed(object sender, PointerRoutedEventArgs e)
         {
             CapturePointer(e.Pointer);
             grabPoint = e.GetCurrentPoint(this).Position;
-            moved = false;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

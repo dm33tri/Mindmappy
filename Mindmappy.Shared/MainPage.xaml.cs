@@ -17,29 +17,12 @@ using Windows.UI;
 using System.Diagnostics;
 using System.ComponentModel;
 
-using Microsoft.Msagl.Core;
-using Microsoft.Msagl.Core.Geometry;
 using Microsoft.Msagl.Core.Geometry.Curves;
 using Microsoft.Msagl.Core.Layout;
-using Microsoft.Msagl.Core.Routing;
-using Microsoft.Msagl.DebugHelpers;
-using Microsoft.Msagl.DebugHelpers.Persistence;
-using Microsoft.Msagl.Routing;
-using Microsoft.Msagl.Routing.Rectilinear;
-using Microsoft.Msagl.Layout.Layered;
 using Microsoft.Msagl.Layout.Incremental;
 using Microsoft.Msagl.Layout.Initial;
 using MSAGLNode = Microsoft.Msagl.Core.Layout.Node;
-using XAMLRectange = Windows.UI.Xaml.Shapes.Rectangle;
-using XAMLPath = Windows.UI.Xaml.Shapes.Path;
 using MSAGLPoint = Microsoft.Msagl.Core.Geometry.Point;
-using MSAGLRectangle = Microsoft.Msagl.Core.Geometry.Rectangle;
-using LineSegment = Microsoft.Msagl.Core.Geometry.Curves.LineSegment;
-using Ellipse = Microsoft.Msagl.Core.Geometry.Curves.Ellipse;
-using System.Threading;
-using System.Threading.Tasks;
-using Size = Microsoft.Msagl.Core.DataStructures.Size;
-using Microsoft.Msagl.Layout.MDS;
 using Microsoft.Msagl.Miscellaneous;
 using Mindmappy.Shared;
 
@@ -55,7 +38,7 @@ namespace Mindmappy {
         }
         public static MSAGLNode CreateNode(int id)
         {
-            return new MSAGLNode(CurveFactory.CreateRectangle(150, 50, new MSAGLPoint(0, 0)), id);
+            return new MSAGLNode(CurveFactory.CreateRectangle(150, 60, new MSAGLPoint(0, 0)), id);
         }
 
         public GeometryGraph GetGraph()
@@ -124,19 +107,22 @@ namespace Mindmappy {
             LayoutHelpers.RouteAndLabelEdges(graph, layoutSettings, graph.Edges);
             InitializeComponent();
 
-            grid.SizeChanged += (sender, e) =>
-            {
-                if (grid.ActualHeight > 0 && grid.ActualWidth > 0)
-                {
-                    canvas.Width = grid.ActualWidth;
-                    canvas.Height = grid.ActualHeight;
-                    NormalizeGraph();
-                    DrawEdges();
-                    DrawNodes();
-                }
-            };
+            grid.SizeChanged += InitView;
         }
 
+        private void InitView(object sender, SizeChangedEventArgs e)
+        {
+            if (grid.ActualHeight > 0 && grid.ActualWidth > 0)
+            {
+                canvas.Width = grid.ActualWidth;
+                canvas.Height = grid.ActualHeight;
+                NormalizeGraph();
+                DrawEdges();
+                DrawNodes();
+            }
+
+            grid.SizeChanged -= InitView;
+        }
         public event PropertyChangedEventHandler PropertyChanged;
         void OnPropertyChanged(string propertyName = null)
         {

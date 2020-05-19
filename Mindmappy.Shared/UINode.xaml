@@ -10,18 +10,41 @@
     Canvas.Left="{Binding Left}"
     Canvas.Top="{Binding Top}"
     Canvas.ZIndex="2">
-    <Grid Width="{Binding Path=RectWidth}" Height="{Binding Path=RectHeight}">
-        <Rectangle x:Name="rect" Fill="LightGray" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="{Binding Path=RectWidth}" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
         <TextBox
-            Background="Transparent"
-            BorderThickness="0"
-            VerticalAlignment="Center" 
-            HorizontalAlignment="Center"
+            x:Name="textBox"
+            Grid.Column="0"
+            Width="{Binding Path=RectWidth}"
+            Height="{Binding Path=RectHeight}"
+            IsTabStop="False"
+            Background="LightGray"
+            VerticalAlignment="Stretch" 
+            HorizontalAlignment="Stretch"
             AcceptsReturn="True"
             TextWrapping="Wrap"
-            Padding="5"
-            Margin="10"
-            x:Name="textBox"
-            Text="{Binding Path=Label, Mode=TwoWay}" />
+            TextAlignment="Center"
+            Text="{Binding Path=Label, Mode=TwoWay}">
+        </TextBox>
+        <Rectangle 
+            x:Name="rect" 
+            Grid.Column="0"
+            Width="{Binding Path=RectWidth}"
+            Height="{Binding Path=RectHeight}" 
+            Fill="Transparent" 
+            VerticalAlignment="Stretch" 
+            HorizontalAlignment="Stretch" />
+        <Ellipse
+            x:Name="point"
+            VerticalAlignment="Bottom"
+            Grid.Column="1"
+            Width="8" 
+            Height="8" 
+            Margin="-5, 0, 0, -3"
+            Visibility="{Binding Path=Active}"
+            Fill="{ThemeResource SystemAccentColor}" />
     </Grid>
 </Page>
