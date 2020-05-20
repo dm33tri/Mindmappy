@@ -9,9 +9,9 @@
     mc:Ignorable="d"
     Canvas.Top="0"
     Canvas.Left="0"
-    Canvas.ZIndex="1">
+    Canvas.ZIndex="0">
     <Grid>
-        <Path x:Name="background" Data="{Binding Path=PathData}" Stroke="Transparent" StrokeThickness="10" />
         <Path x:Name="foreground" Data="{Binding Path=PathData}" Stroke="{Binding Path=StrokeColor}" StrokeThickness="{Binding Path=StrokeThickness}" />
+        <Path x:Name="background" Data="{Binding Path=PathData}" Stroke="Transparent" StrokeThickness="10" />
     </Grid>
 </Page>

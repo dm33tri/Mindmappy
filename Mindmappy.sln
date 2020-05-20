@@ -6,9 +6,6 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Mindmappy.Shared", "Mindmappy.Shared\Mindmappy.Shared.shproj", "{6279C845-92F8-4333-AB99-3D213163593C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mindmappy.Droid", "Mindmappy.Droid\Mindmappy.Droid.csproj", "{9B1FCA63-D819-4FF2-B8F8-E4954E675F89}"
-	ProjectSection(ProjectDependencies) = postProject
-		{5A68CCAE-FE84-416F-9CB3-DA9767A0666F} = {5A68CCAE-FE84-416F-9CB3-DA9767A0666F}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mindmappy.UWP", "Mindmappy.UWP\Mindmappy.UWP.csproj", "{1DC70C07-B8AE-4CE0-AC76-29D8E395D650}"
 EndProject

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.ComponentModel;
+using System.Diagnostics;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -12,49 +14,34 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-using System.ComponentModel;
+using Windows.UI.Input;
+using Windows.UI;
 using Microsoft.Msagl.Core.Layout;
-using MSAGLPoint = Microsoft.Msagl.Core.Geometry.Point;
-using MSAGLRectangle = Microsoft.Msagl.Core.Geometry.Rectangle;
 using Microsoft.Msagl.Miscellaneous;
 using Microsoft.Msagl.Layout.Incremental;
 using Microsoft.Msagl.Layout.Initial;
-using System.Diagnostics;
 using Microsoft.Msagl.Core.Geometry.Curves;
+using MSAGLPoint = Microsoft.Msagl.Core.Geometry.Point;
+using MSAGLRectangle = Microsoft.Msagl.Core.Geometry.Rectangle;
+using MSAGLNode = Microsoft.Msagl.Core.Layout.Node;
 
 namespace Mindmappy.Shared
 {
     public sealed partial class UINode : Page, INotifyPropertyChanged
     {
-        public string Label { get; set; } = "Node label";
-        public Node Node { get; set; }
-        public new Canvas Parent { get; set; }
+        public string Label { get; set; }
+        public MSAGLNode Node { get; set; }
+        public MainPage ParentPage { get; set; }
         public GeometryGraph Graph { get; set; }
         public FastIncrementalLayoutSettings LayoutSettings { get; set; }
 
         private Point grabPoint;
 
-        public double Top
-        {
-            get => Node?.BoundingBox.Bottom ?? 0; // 🤷‍
-        }
+        public double Top { get => Node?.BoundingBox.Bottom ?? 0; }
+        public double Left { get => Node?.BoundingBox.Left ?? 0; }
+        public double NodeWidth { get => Node?.BoundingBox.Width ?? 100; }
+        public double NodeHeight { get => Node?.BoundingBox.Height ?? 100; }
 
-        public double Left
-        {
-            get => Node?.BoundingBox.Left ?? 0;
-        }
-
-        public double RectWidth
-        {
-            get => Node?.BoundingBox.Width ?? 100;
-        }
-
-        public double RectHeight
-        {
-            get => Node?.BoundingBox.Height ?? 100;
-        }
-
-        private Point pointPos;
         private bool active;
         public bool Active
         {
@@ -63,20 +50,31 @@ namespace Mindmappy.Shared
             {
                 active = value;
                 OnPropertyChanged("Active");
+                OnPropertyChanged("Stroke");
             }
         }
 
-        /// <summary>
-        ///  Хаки для WASM и Android, потому что события фокуса там работают иначе
-        /// </summary>
-        bool tapped;
-        bool resizing;
-        bool resetState;
-        
-        public UINode(Node node, Canvas parent, GeometryGraph graph, FastIncrementalLayoutSettings settings)
+        private bool moving;
+        public bool Moving
+        {
+            get => moving;
+            set
+            {
+                moving = value;
+                OnPropertyChanged("Stroke");
+            }
+        }
+
+        private SolidColorBrush defaultBrush = new SolidColorBrush { Color = Colors.Gray };
+        private SolidColorBrush highlightBrush = new SolidColorBrush { Color = Color.FromArgb(255, 0, 120, 212) };
+
+        public Brush Stroke { get => active || Moving ? highlightBrush : defaultBrush; }
+        private bool resizing;
+
+        public UINode(MSAGLNode node, MainPage parent, GeometryGraph graph, FastIncrementalLayoutSettings settings)
         {
             Node = node;
-            Parent = parent;
+            ParentPage = parent;
             Graph = graph;
             LayoutSettings = settings;
 
@@ -86,117 +84,137 @@ namespace Mindmappy.Shared
             PointerReleased += OnPointerReleased;
             PointerMoved += OnPointerMoved;
             Tapped += OnTapped;
-            LostFocus += OnLostFocus;
-            point.PointerPressed += Point_OnPointerPressed;
-            point.PointerReleased += Point_OnPointerReleased;
-
-            GotFocus += UINode_GotFocus;
-
-            Parent.Children.Add(this);
+            Holding += OnHolding;
+            removeButton.Tapped += OnRemoveClick;
+            addEdgeButton.Tapped += OnAddEdgeClick;
+            resizePoint.PointerPressed += ResizePoint_OnPointerPressed;
+            resizePoint.PointerReleased += ResizePoint_OnPointerReleased;
+            ParentPage.Unfocus += Unfocus;
+            ParentPage.Canvas.Children.Add(this);
         }
 
-        private void UINode_GotFocus(object sender, RoutedEventArgs e)
+        private void Unfocus()
         {
-            if (resizing)
+            Active = false;
+            overlay.Visibility = Visibility.Visible;
+            textBox.IsReadOnly = true;
+        }
+
+        private void OnHolding(object sender, HoldingRoutedEventArgs e)
+        {
+            if (e.HoldingState == HoldingState.Started)
             {
-                Active = true;
-                rect.Visibility = Visibility.Collapsed;
-            }
-            if (tapped)
-            {
-                Active = true;
-                rect.Visibility = Visibility.Collapsed;
-                textBox.IsTabStop = true;
-                textBox.Focus(FocusState.Programmatic);
-                textBox.IsTabStop = false;
+                Moving = true;
             }
         }
 
         private void OnTapped(object sender, TappedRoutedEventArgs e)
         {
-            tapped = true;
-            resetState = false;
-            Active = true;
-            rect.Visibility = Visibility.Collapsed;
-            textBox.IsTabStop = true;
-            textBox.Focus(FocusState.Programmatic);
-            textBox.IsTabStop = false;
-        }
-
-        private void Point_OnPointerReleased(object sender, PointerRoutedEventArgs e)
-        {
-            resizing = false;
-            point.ReleasePointerCapture(e.Pointer);
-        }
-
-        private void Point_OnPointerPressed(object sender, PointerRoutedEventArgs e)
-        {
-            resizing = true;
-            point.CapturePointer(e.Pointer);
-            pointPos = e.GetCurrentPoint(point).Position;
-        }
-
-        private void OnLostFocus(object sender, RoutedEventArgs e)
-        {
-            if (resetState && tapped)
+            e.Handled = true;
+            if (ParentPage.CursorEdge != null)
             {
-                resetState = false;
-                tapped = false;
+                ParentPage.AttachEdge(this);
+                return;
             }
             else
             {
-                resetState = true;
+                Focus();
             }
+        }
 
-                
-            Active = false;
-            rect.Visibility = Visibility.Visible;
+        private void ResizePoint_OnPointerReleased(object sender, PointerRoutedEventArgs e)
+        {
+            resizing = false;
+            resizePoint.ReleasePointerCapture(e.Pointer);
+        }
+
+        private void ResizePoint_OnPointerPressed(object sender, PointerRoutedEventArgs e)
+        {
+            resizing = true;
+            resizePoint.CapturePointer(e.Pointer);
+            e.Handled = true;
         }
 
         private void OnPointerMoved(object sender, PointerRoutedEventArgs e)
         {
-            if (!resizing && PointerCaptures?.Count > 0)
+            if (!resizing && Moving)
             {
-                var cursorPos = e.GetCurrentPoint(Parent).Position;
+                var cursorPos = e.GetCurrentPoint(ParentPage.Canvas).Position;
                 var p1 = new MSAGLPoint(cursorPos.X, cursorPos.Y);
                 var p2 = new MSAGLPoint(grabPoint.X, grabPoint.Y);
                 var p3 = new MSAGLPoint(Node.Width / 2, Node.Height / 2);
                 Node.Center = p1 + p3 - p2;
                 OnPropertyChanged("Left");
                 OnPropertyChanged("Top");
-                LayoutHelpers.RouteAndLabelEdges(Graph, LayoutSettings, Graph.Edges);
             }
             else if (resizing)
             {
-                var cursorPos = e.GetCurrentPoint(point).Position;
-                MSAGLPoint p1 = new MSAGLPoint(cursorPos.X, cursorPos.Y);
-                MSAGLPoint p2 = new MSAGLPoint(pointPos.X, pointPos.Y);
+                var cursorPos = e.GetCurrentPoint(ParentPage.Canvas).Position;
+                MSAGLPoint point = new MSAGLPoint(cursorPos.X, cursorPos.Y);
                 var Box = Node.BoundingBox;
-                if (Node.Width + p1.X - p2.X >= 150)
+                if (Box.Left + 150 <= point.X)
                 {
-                    Box.Right += p1.X - p2.X;
+                    Box.Right = point.X;
                 }
-                if (Node.Height + p1.Y - p2.Y >= 60)
+                if (Box.Bottom + 60 <= point.Y)
                 {
-                    Box.Top += p1.Y - p2.Y;
+                    Box.Top = point.Y;
                 }
                 Node.BoundingBox = Box;
-                OnPropertyChanged("RectWidth");
-                OnPropertyChanged("RectHeight");
-                LayoutHelpers.RouteAndLabelEdges(Graph, LayoutSettings, Graph.Edges);
+                OnPropertyChanged("NodeWidth");
+                OnPropertyChanged("NodeHeight");
             }
+            LayoutHelpers.RouteAndLabelEdges(Graph, LayoutSettings, Graph.Edges);
+
         }
 
         private void OnPointerReleased(object sender, PointerRoutedEventArgs e)
         {
+            Moving = false;
             resizing = false;
             ReleasePointerCapture(e.Pointer);
         }
 
         private void OnPointerPressed(object sender, PointerRoutedEventArgs e)
         {
-            CapturePointer(e.Pointer);
+#if !__ANDROID__
+            if (e.GetCurrentPoint(ParentPage.Canvas).Properties.IsLeftButtonPressed)
+            {
+                Moving = true;
+            }
+#endif
             grabPoint = e.GetCurrentPoint(this).Position;
+            CapturePointer(e.Pointer);
+        }
+
+        public void OnRemoveClick(object sender, RoutedEventArgs e)
+        {
+            var edges = Node.Edges.ToArray();
+            foreach (var edge in edges)
+            {
+                (edge.UserData as UIEdge).Remove();
+            }
+            Graph.Nodes.Remove(Node);
+            LayoutHelpers.RouteAndLabelEdges(Graph, LayoutSettings, Graph.Edges);
+            ParentPage.Canvas.Children.Remove(this);
+        }
+
+        public void OnAddEdgeClick(object sender, TappedRoutedEventArgs e)
+        {
+            e.Handled = true;
+            ParentPage.AddCursorNode(this);
+        }
+
+        public void Focus()
+        {
+            textBox.IsReadOnly = false;
+            Active = true;
+            overlay.Visibility = Visibility.Collapsed;
+#if !__ANDROID__
+            textBox.IsTabStop = true;
+            textBox.Focus(FocusState.Programmatic);
+            textBox.IsTabStop = false;
+#endif
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

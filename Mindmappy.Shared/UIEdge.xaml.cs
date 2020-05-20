@@ -38,7 +38,6 @@ using LineSegment = Microsoft.Msagl.Core.Geometry.Curves.LineSegment;
 using Ellipse = Microsoft.Msagl.Core.Geometry.Curves.Ellipse;
 using System.Threading;
 using System.Threading.Tasks;
-using Size = Microsoft.Msagl.Core.DataStructures.Size;
 using Microsoft.Msagl.Layout.MDS;
 using Microsoft.Msagl.Miscellaneous;
 
@@ -46,6 +45,14 @@ namespace Mindmappy.Shared
 {
     public sealed partial class UIEdge : Page, INotifyPropertyChanged
     {
+        private bool HitDetect(MSAGLPoint point)
+        {
+            ICurve curve = Edge.Curve;
+            MSAGLPoint closest = Curve.ClosestPoint(curve, point);
+            double length = (point - closest).Length;
+            return length < 8;
+        }
+
         private string GetPathData(ICurve curve)
         {
             if (curve is Curve)
@@ -101,7 +108,7 @@ namespace Mindmappy.Shared
 
             return "";
         }
-        
+
         private string pathData;
         public string PathData
         {
@@ -112,28 +119,37 @@ namespace Mindmappy.Shared
                 OnPropertyChanged("PathData");
             }
         }
+
+        private GeometryGraph Graph { get; set; }
         public Edge Edge { get; set; }
-        public new Canvas Parent { get; set; }
+        public MainPage ParentPage { get; set; }
 
         private bool selected;
-        public bool Selected {
-            get => selected;
-            set
-            {
-                selected = value;
+        public bool Selected { 
+            get => ParentPage.SelectedEdge == this; 
+            set {
+                if (value && ParentPage.SelectedEdge == null)
+                {
+                    ParentPage.SelectedEdge = this;
+                }
+                else if (ParentPage.SelectedEdge == this)
+                {
+                    ParentPage.SelectedEdge = null;
+                }
                 OnPropertyChanged("StrokeColor");
                 OnPropertyChanged("StrokeThickness");
             }
-        }
-        
+        }        
         public string StrokeColor { get => Selected ? "Blue" : "Black"; }
-        public int StrokeThickness { get => Selected ? 3 : 1; }
+        public int StrokeThickness { get => Selected ? 3 : 2; }
 
-        public UIEdge(Edge edge, Canvas parent)
+        public UIEdge(Edge edge, MainPage parent, GeometryGraph graph)
         {
-            Parent = parent;
+            ParentPage = parent;
             Edge = edge;
             PathData = GetPathData(edge.Curve);
+            Graph = graph;
+            Edge.UserData = this;
 
             InitializeComponent();
 
@@ -145,12 +161,37 @@ namespace Mindmappy.Shared
                 }
             };
 
-            PointerPressed += (sender, e) =>
-            {
-                Selected = !Selected;
-            };
+            ParentPage.Unfocus += ParentPage_Unfocus;
+            ParentPage.Canvas.Tapped += OnTapped;
+            ParentPage.Canvas.Children.Add(this);
+        }
 
-            Parent.Children.Add(this);
+        private void ParentPage_Unfocus()
+        {
+            Selected = false;
+        }
+
+        private void OnTapped(object sender, TappedRoutedEventArgs e)
+        {
+            var p = e.GetPosition(ParentPage.Canvas);
+            MSAGLPoint point = new MSAGLPoint(p.X, p.Y);
+            if (HitDetect(point))
+            {
+                Selected = true;
+            }
+            else
+            {
+                Selected = false;
+            }
+        }
+
+        public void Remove()
+        {
+            ParentPage.Canvas.Tapped -= OnTapped;
+            var e = Edge;
+            Edge = null;
+            ParentPage.Canvas.Children.Remove(this);
+            Graph.Edges.Remove(e);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

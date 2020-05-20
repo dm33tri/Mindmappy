@@ -16,26 +16,78 @@ using Windows.UI.Xaml.Shapes;
 using Windows.UI;
 using System.Diagnostics;
 using System.ComponentModel;
-
 using Microsoft.Msagl.Core.Geometry.Curves;
 using Microsoft.Msagl.Core.Layout;
 using Microsoft.Msagl.Layout.Incremental;
 using Microsoft.Msagl.Layout.Initial;
+using Microsoft.Msagl.Miscellaneous;
 using MSAGLNode = Microsoft.Msagl.Core.Layout.Node;
 using MSAGLPoint = Microsoft.Msagl.Core.Geometry.Point;
-using Microsoft.Msagl.Miscellaneous;
 using Mindmappy.Shared;
 
 namespace Mindmappy {
+    public delegate void UnfocusEventHandler();
 
     public sealed partial class MainPage : INotifyPropertyChanged
     {
-        public string LineData { get; set; } = "";
+        private UIEdge selectedEdge;
+        public UIEdge SelectedEdge { 
+            get => selectedEdge; 
+            set
+            {
+                selectedEdge = value;
+                OnPropertyChanged("IsEdgeSelected");
+            } 
+        }
+        public Visibility IsEdgeSelected { get => SelectedEdge != null ? Visibility.Visible : Visibility.Collapsed; }
+        public event UnfocusEventHandler Unfocus;
+        private AddEdgeCursor cursor;
+        public UIEdge CursorEdge { get; set; }
+        public void AddCursorNode(UINode origin)
+        {
+            var tempNode = new MSAGLNode(CurveFactory.CreateRectangle(1, 1, new MSAGLPoint(0, 0)));
+            var tempEdge = new Edge(origin.Node, tempNode);
+            graph.Nodes.Add(tempNode);
+            graph.Edges.Add(tempEdge);
+            CursorEdge = new UIEdge(tempEdge, this, graph);
+            cursor = new AddEdgeCursor(tempNode, this, graph, layoutSettings);
+            canvas.PointerMoved += cursor.OnPointerMoved;
+        }
+
+        private void OnTapped(object sender, TappedRoutedEventArgs e)
+        {
+            if (cursor != null)
+            {
+                AttachEdge(null);
+            }
+        }
+
+        public void AttachEdge(UINode node)
+        {
+            var origin = CursorEdge.Edge.Source;
+
+            canvas.PointerMoved -= cursor.OnPointerMoved;
+            CursorEdge.Remove();
+            graph.Nodes.Remove(cursor.Node);
+            CursorEdge = null;
+            cursor = null;
+
+            if (node != null && origin != node.Node)
+            {
+                var newEdge = new Edge(origin, node.Node);
+                graph.Edges.Add(newEdge);
+                new UIEdge(newEdge, this, graph);
+                LayoutHelpers.RouteAndLabelEdges(graph, layoutSettings, new[] { newEdge });
+            }
+        }
+
+        public Canvas Canvas { get => canvas; }
 
         public static Edge CreateEdge(Node source, Node target)
         {
             return new Edge(source, target);
         }
+
         public static MSAGLNode CreateNode(int id)
         {
             return new MSAGLNode(CurveFactory.CreateRectangle(150, 60, new MSAGLPoint(0, 0)), id);
@@ -62,25 +114,22 @@ namespace Mindmappy {
         }
 
         public GeometryGraph graph;
-
         public InitialLayout layout;
         public FastIncrementalLayoutSettings layoutSettings;
 
         public void DrawNodes()
         {
-            for (int i = 0; i < graph.Nodes.Count; ++i)
+            foreach (var node in graph.Nodes)
             {
-                new UINode(graph.Nodes[i], canvas, graph, layoutSettings);
+                new UINode(node, this, graph, layoutSettings);
             }
         }
 
         public void DrawEdges()
         {
-            for (
-                var enumerator = graph.Edges.GetEnumerator(); 
-                enumerator.MoveNext(); )
+            foreach (var edge in graph.Edges)
             {
-                new UIEdge(enumerator.Current, canvas);
+                new UIEdge(edge, this, graph);
             }
         }
 
@@ -105,24 +154,51 @@ namespace Mindmappy {
             graph.AlgorithmData = layout;
             layout.Run();
             LayoutHelpers.RouteAndLabelEdges(graph, layoutSettings, graph.Edges);
+
             InitializeComponent();
 
-            grid.SizeChanged += InitView;
+            PointerPressed += OnPointerPressed;
+            canvas.Tapped += OnTapped;
+            canvasGrid.SizeChanged += InitView;
+            addNodeButton.Click += AddNode;
+            removeEdgeButton.Click += RemoveEdge;
+        }
+
+        private void OnPointerPressed(object sender, PointerRoutedEventArgs e)
+        {
+            Unfocus();
         }
 
         private void InitView(object sender, SizeChangedEventArgs e)
         {
-            if (grid.ActualHeight > 0 && grid.ActualWidth > 0)
+            if (canvasGrid.ActualHeight > 0 && canvasGrid.ActualWidth > 0)
             {
-                canvas.Width = grid.ActualWidth;
-                canvas.Height = grid.ActualHeight;
+                canvas.Width = canvasGrid.ActualWidth;
+                canvas.Height = canvasGrid.ActualHeight;
                 NormalizeGraph();
                 DrawEdges();
                 DrawNodes();
             }
 
-            grid.SizeChanged -= InitView;
+            canvasGrid.SizeChanged -= InitView;
         }
+
+        public void AddNode(object sender, RoutedEventArgs e)
+        {
+            var node = new MSAGLNode(
+                CurveFactory.CreateRectangle(150, 60, new MSAGLPoint(canvas.Width / 2, canvas.Height / 2)), 
+                graph.Nodes.Count
+            );
+            graph.Nodes.Add(node);
+            new UINode(node, this, graph, layoutSettings).Focus();
+        }
+
+        public void RemoveEdge(object sender, RoutedEventArgs e)
+        {
+            SelectedEdge.Remove();
+            SelectedEdge = null;
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
         void OnPropertyChanged(string propertyName = null)
         {
