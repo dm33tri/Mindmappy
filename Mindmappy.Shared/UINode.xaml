@@ -11,6 +11,7 @@
     DataContext="{Binding RelativeSource={RelativeSource Self}}" 
     Canvas.Left="{Binding Path=Left}"
     Canvas.Top="{Binding Path=Top}"
+    ManipulationMode="TranslateX,TranslateY"
     Canvas.ZIndex="2">
     <Grid>
         <Grid.ColumnDefinitions>
@@ -95,6 +96,6 @@
             android:Margin="0, 0, -8, -8"
             Visibility="{Binding Path=Active}"
             Fill="{ThemeResource SystemAccentColor}"
-            FocusVisualMargin="10" />
+            ManipulationMode="TranslateX,TranslateY" />
     </Grid>
 </Page>

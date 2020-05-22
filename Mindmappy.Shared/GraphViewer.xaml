@@ -1,0 +1,69 @@
+﻿<Page
+    x:Class="Mindmappy.GraphViewer"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:android="http://uno.ui/android"
+    xmlns:not_android="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    DataContext="{Binding RelativeSource={RelativeSource Self}}"
+    Background="White"
+    mc:Ignorable="d android">
+
+    <Grid x:Name="canvasGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Button Opacity="0" x:Name="focusButton" />
+        <android:Canvas>
+            <Grid Canvas.Left="{Binding Path=OffsetX}" Canvas.Top="{Binding Path=OffsetY}" Width="{Binding Path=CanvasWidth}" Height="{Binding Path=CanvasHeight}">
+                <Canvas ManipulationMode="All" ManipulationDelta="CanvasManipulationDelta" Background="White" x:Name="canvas" Width="{Binding Path=CanvasWidth}" Height="{Binding Path=CanvasHeight}" />
+            </Grid>
+        </android:Canvas>
+        <not_android:ScrollViewer Grid.Row="0"  VerticalScrollMode="Enabled" HorizontalScrollMode="Enabled" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible" x:Name="scrollViewer">
+            <Canvas Background="White" x:Name="canvas" Width="{Binding Path=CanvasWidth}" Height="{Binding Path=CanvasHeight}" />
+        </not_android:ScrollViewer>
+
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Background="LightGray">
+            <AppBarButton x:Name="addNodeButton" Label="Добавить вершину">
+                <AppBarButton.Icon>
+                    <FontIcon android:FontSize="12" FontFamily="Segoe UI Emoji" Glyph="➕"/>
+                </AppBarButton.Icon>
+            </AppBarButton>
+            <AppBarButton Visibility="Collapsed" x:Name="addEdgeButton" Label="Добавить ребро">
+                <AppBarButton.Icon>
+                    <FontIcon android:FontSize="12" FontFamily="Segoe UI Emoji" Glyph="🔗"/>
+                </AppBarButton.Icon>
+            </AppBarButton>
+            <AppBarButton Visibility="Collapsed" x:Name="removeNodeButton" Label="Удалить вершину">
+                <AppBarButton.Icon>
+                    <FontIcon android:FontSize="12" FontFamily="Segoe UI Emoji" Glyph="❌"/>
+                </AppBarButton.Icon>
+            </AppBarButton>
+            <AppBarButton Visibility="{Binding Path=IsEdgeSelected}" x:Name="removeEdgeButton" Label="Удалить ребро">
+                <AppBarButton.Icon>
+                    <FontIcon android:FontSize="12" FontFamily="Segoe UI Emoji" Glyph="❌"/>
+                </AppBarButton.Icon>
+            </AppBarButton>
+        </StackPanel>
+        
+        <NavigationView PaneDisplayMode="LeftMinimal" IsBackButtonVisible="Collapsed" IsSettingsVisible="False">
+            <NavigationView.MenuItems>
+                <NavigationViewItem Content="Создать новый граф" x:Name="createNewGraph" />
+                <NavigationViewItem Content="Подключиться" x:Name="connect" />
+                <NavigationViewItem Content="Поделиться" x:Name="share" />
+                <NavigationViewItem Content="Экспортировать" x:Name="exportMenuItem" />
+                <NavigationViewItem Content="Импортировать" x:Name="importMenuItem" />
+                <NavigationViewItemSeparator />
+                <NavigationViewItem Content="Граф 1" />
+            </NavigationView.MenuItems>
+        </NavigationView>
+        
+        
+    </Grid>
+
+</Page>

@@ -28,25 +28,26 @@ namespace Mindmappy.Shared
     public sealed partial class AddEdgeCursor : Page, INotifyPropertyChanged
     {
         public MSAGLNode Node { get; set; }
-        public new MainPage Parent { get; set; }
+
+        public GraphViewer ParentPage { get; set; }
         public GeometryGraph Graph { get; set; }
         public FastIncrementalLayoutSettings LayoutSettings { get; set; }
 
-        public AddEdgeCursor(Node node, MainPage parent, GeometryGraph graph, FastIncrementalLayoutSettings settings)
+        public AddEdgeCursor(MSAGLNode node, GraphViewer parent, GeometryGraph graph, FastIncrementalLayoutSettings settings)
         {
             Node = node;
-            Parent = parent;
+            ParentPage = parent;
             Graph = graph;
             LayoutSettings = settings;
 
             InitializeComponent();
 
-            Parent.Canvas.Children.Add(this);
+            ParentPage.Canvas.Children.Add(this);
         }
 
         public void OnPointerMoved(object sender, PointerRoutedEventArgs e)
         {
-            var cursorPos = e.GetCurrentPoint(Parent).Position;
+            var cursorPos = e.GetCurrentPoint(ParentPage.Canvas).Position;
             Node.Center = new MSAGLPoint(cursorPos.X, cursorPos.Y);
             LayoutHelpers.RouteAndLabelEdges(Graph, LayoutSettings, Graph.Edges);
         }

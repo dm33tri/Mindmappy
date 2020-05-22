@@ -1,5 +1,5 @@
 ﻿<Page
-    x:Class="Mindmappy.Shared.MainPage"
+    x:Class="Mindmappy.Shared.Menu"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Mindmappy.Shared"
@@ -9,9 +9,6 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <NavigationView PaneDisplayMode="LeftMinimal" IsSettingsVisible="False">
-            <NavigationView.PaneTitle>Редактирование графа</NavigationView.PaneTitle>
-            
-        </NavigationView>
+
     </Grid>
 </Page>

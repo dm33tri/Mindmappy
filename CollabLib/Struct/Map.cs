@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CollabLib
+namespace CollabLib.Struct
 {
-    class Client
+    class Map
     {
     }
 }

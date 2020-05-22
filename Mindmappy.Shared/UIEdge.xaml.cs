@@ -1,45 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
-using Windows.UI.Xaml.Shapes;
-using Windows.UI;
-using System.Diagnostics;
 using System.ComponentModel;
-
-using Microsoft.Msagl.Core;
-using Microsoft.Msagl.Core.Geometry;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Input;
 using Microsoft.Msagl.Core.Geometry.Curves;
 using Microsoft.Msagl.Core.Layout;
-using Microsoft.Msagl.Core.Routing;
-using Microsoft.Msagl.DebugHelpers;
-using Microsoft.Msagl.DebugHelpers.Persistence;
-using Microsoft.Msagl.Routing;
-using Microsoft.Msagl.Routing.Rectilinear;
-using Microsoft.Msagl.Layout.Layered;
-using Microsoft.Msagl.Layout.Incremental;
-using Microsoft.Msagl.Layout.Initial;
-using MSAGLNode = Microsoft.Msagl.Core.Layout.Node;
-using XAMLRectange = Windows.UI.Xaml.Shapes.Rectangle;
-using XAMLPath = Windows.UI.Xaml.Shapes.Path;
 using MSAGLPoint = Microsoft.Msagl.Core.Geometry.Point;
-using MSAGLRectangle = Microsoft.Msagl.Core.Geometry.Rectangle;
-using LineSegment = Microsoft.Msagl.Core.Geometry.Curves.LineSegment;
-using Ellipse = Microsoft.Msagl.Core.Geometry.Curves.Ellipse;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Msagl.Layout.MDS;
-using Microsoft.Msagl.Miscellaneous;
+using MSAGLLineSegment = Microsoft.Msagl.Core.Geometry.Curves.LineSegment;
 
 namespace Mindmappy.Shared
 {
@@ -62,9 +29,9 @@ namespace Mindmappy.Shared
                 for (int i = 0; i < (curve as Curve).Segments.Count; ++i)
                 {
                     ICurve segment = (curve as Curve).Segments[i];
-                    if (segment is LineSegment)
+                    if (segment is MSAGLLineSegment)
                     {
-                        var s = segment as LineSegment;
+                        var s = segment as MSAGLLineSegment;
                         string data = string.Format(
                             "M{0},{1}L{2},{3}",
                             Math.Round(s[0].X),
@@ -94,9 +61,9 @@ namespace Mindmappy.Shared
 
                 return string.Join("", result);
             }
-            else if (curve is LineSegment)
+            else if (curve is MSAGLLineSegment)
             {
-                var s = curve as LineSegment;
+                var s = curve as MSAGLLineSegment;
                 return string.Format(
                     "M{0},{1}L{2},{3}",
                     Math.Round(s[0].X),
@@ -122,9 +89,7 @@ namespace Mindmappy.Shared
 
         private GeometryGraph Graph { get; set; }
         public Edge Edge { get; set; }
-        public MainPage ParentPage { get; set; }
-
-        private bool selected;
+        public GraphViewer ParentPage { get; set; }
         public bool Selected { 
             get => ParentPage.SelectedEdge == this; 
             set {
@@ -143,7 +108,7 @@ namespace Mindmappy.Shared
         public string StrokeColor { get => Selected ? "Blue" : "Black"; }
         public int StrokeThickness { get => Selected ? 3 : 2; }
 
-        public UIEdge(Edge edge, MainPage parent, GeometryGraph graph)
+        public UIEdge(Edge edge, GraphViewer parent, GeometryGraph graph, bool temp = false)
         {
             ParentPage = parent;
             Edge = edge;
@@ -161,8 +126,11 @@ namespace Mindmappy.Shared
                 }
             };
 
-            ParentPage.Unfocus += ParentPage_Unfocus;
-            ParentPage.Canvas.Tapped += OnTapped;
+            if (!temp)
+            {
+                ParentPage.Unfocus += ParentPage_Unfocus;
+                ParentPage.Canvas.Tapped += OnTapped;
+            }
             ParentPage.Canvas.Children.Add(this);
         }
 
