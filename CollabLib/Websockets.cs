@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CollabLib
 {
-    class UndoManager
+    public class Websockets
     {
     }
 }

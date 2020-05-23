@@ -48,6 +48,7 @@
     <PackageReference Include="Uno.Core.Build" Version="2.0.0" />
     <PackageReference Include="Uno.UI" Version="2.3.2" />
     <PackageReference Include="Uno.UI.RemoteControl" Version="2.3.2" Condition="'$(Configuration)'=='Debug'" />
+    <PackageReference Include="Uno.UI.RemoteControl" Version="2.3.2" />
     <PackageReference Include="Uno.Wasm.Bootstrap" Version="1.2.0" />
     <PackageReference Include="Uno.Wasm.Bootstrap.DevServer" Version="1.2.0" />
     <PackageReference Include="Uno.Wasm.WebSockets" Version="1.0.0-dev.32" />

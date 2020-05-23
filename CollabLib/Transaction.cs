@@ -22,28 +22,23 @@ namespace CollabLib
     public class Transaction
     {
         public Document doc;
-        Dictionary<int, int> beforeState;
-        Dictionary<int, int> afterState;
+        public Dictionary<int, int> beforeState;
+        public Dictionary<int, int> afterState;
         public Dictionary<AbstractStruct, HashSet<string>> changed;
         public Dictionary<int, List<DeleteItem>> deleted;
-        Dictionary<AbstractStruct, List<Event>> changedParentTypes;
+        public Dictionary<AbstractStruct, List<Event>> changedParentTypes;
         public HashSet<ID> mergeItems;
         public bool local;
 
         public Transaction(Document doc)
         {
             this.doc = doc;
-            this.deleted = new Dictionary<int, List<DeleteItem>>();
-            this.beforeState = this.doc.store.StateVector;
-            this.afterState = new Dictionary<int, int>();
-            this.changed = new Dictionary<AbstractStruct, HashSet<string>>();
-            this.changedParentTypes = new Dictionary<AbstractStruct, List<Event>>();
-            this.mergeItems = new HashSet<ID>();
-        }
-
-        public static void Transact(Document document, TransactionFunc action)
-        {
-
+            deleted = new Dictionary<int, List<DeleteItem>>();
+            beforeState = doc.store.StateVector;
+            afterState = new Dictionary<int, int>();
+            changed = new Dictionary<AbstractStruct, HashSet<string>>();
+            changedParentTypes = new Dictionary<AbstractStruct, List<Event>>();
+            mergeItems = new HashSet<ID>();
         }
 
         public void SetDeleted(Item item)
@@ -54,19 +49,19 @@ namespace CollabLib
         public void SetChanged(AbstractStruct changedStruct, string parentKey) 
         {
             Item item = changedStruct.item;
-            if (item == null || (item.id.clock < this.beforeState[item.id.client] && !item.deleted))
+            if (item == null || (item.id.clock < beforeState[item.id.client] && !item.deleted))
             {
-                if (!this.changed.ContainsKey(changedStruct))
+                if (!changed.ContainsKey(changedStruct))
                 {
-                    this.changed[changedStruct] = new HashSet<string>();
+                    changed[changedStruct] = new HashSet<string>();
                 }
-                this.changed[changedStruct].Add(parentKey);
+                changed[changedStruct].Add(parentKey);
             }
         }
         
         public ID NextID()
         {
-            return new ID(this.doc.clientId, this.doc.store.GetState(this.doc.clientId));
+            return new ID(doc.clientId, doc.store.GetState(doc.clientId));
         }
     }
 

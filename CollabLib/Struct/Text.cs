@@ -25,7 +25,7 @@ namespace CollabLib.Struct
             return string.Join("", chunks.ToArray());
         }
 
-        private void InsertTextFunc(int index, string text, Transaction transaction)
+        public void InsertTextFunc(int index, string text, Transaction transaction)
         {
             Item left = start;
 
@@ -86,6 +86,6 @@ namespace CollabLib.Struct
 
         }
 
-
+        public override int TypeRef { get; } = 1; 
     }
 }

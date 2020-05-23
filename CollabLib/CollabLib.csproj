@@ -17,4 +17,8 @@
   <ItemGroup>
     <UpToDateCheckInput Include="**\*.xaml" Exclude="bin\**\*.xaml;obj\**\*.xaml" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Net.WebSockets.Client" Version="4.3.2" />
+    <PackageReference Include="Uno.Wasm.WebSockets" Version="1.0.0-dev.32" />
+  </ItemGroup>
 </Project>

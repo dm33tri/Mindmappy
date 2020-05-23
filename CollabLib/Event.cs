@@ -17,7 +17,5 @@ namespace CollabLib
             this.currentTarget = target;
             this.transaction = transaction;
         }
-
-
     }
 }

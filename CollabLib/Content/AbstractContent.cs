@@ -10,5 +10,9 @@ namespace CollabLib.Content
         public abstract int Length { get; }
         public abstract AbstractContent Splice(int index);
         public abstract void Integrate(Transaction transaction, Item item);
+        public abstract int Ref { get; }
+        public abstract byte[] Encode(int offset);
+
+
     }
 }

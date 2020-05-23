@@ -7,15 +7,15 @@
   IgnorableNamespaces="uap mp">
 
   <Identity
-    Name="1dc70c07-b8ae-4ce0-ac76-29d8e395d650"
-    Publisher="CN=dm33t"
-    Version="1.0.0.0" />
+    Name="46045dm33tri.Mindmappy"
+    Publisher="CN=9C3B56DD-3F69-4EEC-A6ED-09B330463E70"
+    Version="1.0.4.0" />
 
-  <mp:PhoneIdentity PhoneProductId="4812a29c-9858-4000-9dba-b978ef6646c9" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <mp:PhoneIdentity PhoneProductId="f21bb449-37b1-4465-9a00-6a277fc279c5" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
     <DisplayName>Mindmappy</DisplayName>
-    <PublisherDisplayName>Mindmappy</PublisherDisplayName>
+    <PublisherDisplayName>dm33tri</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 

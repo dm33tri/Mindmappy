@@ -5,16 +5,10 @@ using System.Text;
 
 namespace CollabLib.Struct
 {
-    public class StructPath
-    {
-        int index;
-        string key;
-        bool isIndexed;
-    }
-
-    public abstract class AbstractStruct
+    public abstract class AbstractStruct : AbstractContent
     {
         public Document doc;
+        public string docName;
         public ID id;
         public Item item;
 
@@ -23,7 +17,9 @@ namespace CollabLib.Struct
 
         public int length;
 
-        public bool Deleted { get => this.item?.deleted ?? false; }
+        public abstract int TypeRef { get; }
+
+        public bool Deleted { get => item?.deleted ?? false; }
 
         public Dictionary<string, Item> map;
 
@@ -31,6 +27,22 @@ namespace CollabLib.Struct
         {
             this.doc = doc;
             this.item = item;
+        }
+
+        public override bool Countable { get; } = true;
+        public override int Length { get; } = 1;
+        public override int Ref { get; } = 7;
+        public override void Integrate(Transaction transaction, Item item)
+        {
+            Integrate(transaction.doc, item);
+        }
+        public override AbstractContent Splice(int index)
+        {
+            throw new NotImplementedException();
+        }
+        public override byte[] Encode(int offset)
+        {
+            return new[] { (byte)TypeRef };
         }
     }
 }
