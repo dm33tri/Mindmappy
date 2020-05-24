@@ -40,6 +40,10 @@ namespace CollabLib.Struct
         {
             throw new NotImplementedException();
         }
+        public override bool MergeWith(AbstractContent right)
+        {
+            throw new NotImplementedException();
+        }
         public override byte[] Encode(int offset)
         {
             return new[] { (byte)TypeRef };

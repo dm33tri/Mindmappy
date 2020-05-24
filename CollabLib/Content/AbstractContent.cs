@@ -12,7 +12,6 @@ namespace CollabLib.Content
         public abstract void Integrate(Transaction transaction, Item item);
         public abstract int Ref { get; }
         public abstract byte[] Encode(int offset);
-
-
+        public abstract bool MergeWith(AbstractContent right);
     }
 }

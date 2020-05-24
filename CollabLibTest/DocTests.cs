@@ -17,7 +17,7 @@ namespace CollabLib.Tests
             {
                 Document doc = new Document();
                 doc.clientId = i;
-                doc.AddTextField("text");
+                doc.AddText("text");
                 documents.Add(doc);
             }
 
@@ -29,10 +29,10 @@ namespace CollabLib.Tests
         {
             //Document doc = GetDocuments(1)[0];
 
-            //Text text = doc.GetTextField("text");
+            //Text text = doc.GetText("text");
             //text.InsertText(0, "Hell world!");
             //text.InsertText(4, "o,");
-            //Assert.Equal("Hello, world!", text.toString());
+            //Assert.Equal("Hello, world!", text.ToString());
         }
 
         [Fact]
@@ -40,8 +40,8 @@ namespace CollabLib.Tests
         {
             Document[] docs = GetDocuments(2);
 
-            Text text1 = docs[0].GetTextField("text");
-            Text text2 = docs[1].GetTextField("text");
+            Text text1 = docs[0].GetText("text");
+            Text text2 = docs[1].GetText("text");
 
             docs[0].Update += (doc, data) =>
             {
@@ -55,7 +55,7 @@ namespace CollabLib.Tests
             });
 
 
-            Assert.Equal("Hello, world!", text2.toString());
+            Assert.Equal("Hello, world!", text2.ToString());
         }
     }
 }

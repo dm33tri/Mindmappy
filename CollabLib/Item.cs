@@ -40,18 +40,19 @@ namespace CollabLib
         public Item Split(int index, Transaction transaction)
         {
             Item rightItem = new Item(
-                new ID(this.id.client, this.id.clock + index),
+                new ID(id.client, id.clock + index),
                 this,
-                new ID(this.id.client, this.id.clock + index - 1),
-                this.right,
-                this.rightOrigin,
-                this.parent,
-                this.parentKey,
-                this.content.Splice(index)
+                new ID(id.client, id.clock + index - 1),
+                right,
+                rightOrigin,
+                parent,
+                parentKey,
+                content.Splice(index)
             );
 
-            rightItem.deleted = this.deleted;
-            this.right = rightItem;
+            rightItem.deleted = deleted;
+
+            right = rightItem;
             if (rightItem.right != null)
             {
                 rightItem.right.left = rightItem;
@@ -64,7 +65,7 @@ namespace CollabLib
                 rightItem.parent.map[rightItem.parentKey] = rightItem;
             }
 
-            this.length = index;
+            length = index;
 
             return rightItem;
         }
@@ -74,13 +75,13 @@ namespace CollabLib
             Store store = transaction.doc.store;
             Item conflictingItem;
 
-            if (this.left != null)
+            if (left != null)
             {
-                conflictingItem = this.left.right;
+                conflictingItem = left.right;
             } 
-            else if (this.parentKey != null)
+            else if (parentKey != null)
             {
-                conflictingItem = parent.map[this.parentKey];
+                conflictingItem = parent.map[parentKey];
                 while (conflictingItem != null && conflictingItem.left != null)
                 {
                     conflictingItem = conflictingItem.left;
@@ -94,17 +95,17 @@ namespace CollabLib
             var conflictingItems = new HashSet<Item>();
             var itemsBeforeOrigin = new HashSet<Item>();
 
-            while (conflictingItem != null && conflictingItem != this.right)
+            while (conflictingItem != null && conflictingItem != right)
             {
                 itemsBeforeOrigin.Add(conflictingItem);
                 conflictingItems.Add(conflictingItem);
 
                 if (
-                    (ID.AreSame(this.leftOrigin, conflictingItem.leftOrigin) && conflictingItem.id.client < this.id.client) ||
+                    (ID.AreSame(leftOrigin, conflictingItem.leftOrigin) && conflictingItem.id.client < id.client) ||
                     (conflictingItem.leftOrigin != null && itemsBeforeOrigin.Contains(store.FindItem(conflictingItem.leftOrigin)))
                 )
                 {
-                    this.left = conflictingItem;
+                    left = conflictingItem;
                     conflictingItems.Clear();
                 }
                 else
@@ -115,16 +116,16 @@ namespace CollabLib
                 conflictingItem = conflictingItem.right;
             }
 
-            if (this.left != null)
+            if (left != null)
             {
-                this.right = this.left.right;
-                this.left.right = this;
+                right = left.right;
+                left.right = this;
             }
             else
             {
-                Item right = null;
+                Item right;
 
-                if (this.parentKey != null)
+                if (parentKey != null)
                 {
                     right = parent.map[parentKey];
                     while (right != null && right.left != null)
@@ -141,50 +142,75 @@ namespace CollabLib
                 this.right = right;
             }
 
-            if (this.right != null)
+            if (right != null)
             {
-                this.right.left = this;
+                right.left = this;
             }
-            else if (this.parentKey != null)
+            else if (parentKey != null)
             {
-                parent.map[this.parentKey] = this;
+                parent.map[parentKey] = this;
 
-                if (this.left != null)
+                if (left != null)
                 {
-                    this.left.Delete(transaction);
+                    left.Delete(transaction);
                 }
             }
 
-            if (parentKey == null && this.countable && !this.deleted)
+            if (parentKey == null && countable && !deleted)
             {
-                parent.length += this.length;
+                parent.length += length;
             }
 
             store.AddItem(this);
 
-            this.content.Integrate(transaction, this);
+            content.Integrate(transaction, this);
 
-            transaction.SetChanged(this.parent, this.parentKey);
+            transaction.SetChanged(parent, parentKey);
 
-            if (parent.Deleted || (this.right != null && this.parentKey != null))
+            if (parent.Deleted || (right != null && parentKey != null))
             {
-                this.Delete(transaction);
+                Delete(transaction);
             }
         }
 
         public void Delete(Transaction transaction)
         {
-            if (!this.deleted)
+            if (!deleted)
             {
-                if (this.countable && this.parentKey == null)
+                if (countable && parentKey == null)
                 {
-                    this.parent.length -= this.length;
+                    parent.length -= length;
                 }
-                this.deleted = true;
+                deleted = true;
 
                 transaction.SetDeleted(this);
-                transaction.SetChanged(this.parent, this.parentKey);
+                transaction.SetChanged(parent, parentKey);
             }
+        }
+
+        public bool MergeWith(Item right)
+        {
+            if (
+                ID.AreSame(right.leftOrigin, new ID(id.client, id.clock + length - 1)) &&
+                this.right == right &&
+                ID.AreSame(rightOrigin, right.rightOrigin) &&
+                id.client == right.id.client &&
+                id.clock + length == right.id.clock &&
+                deleted == right.deleted &&
+                redone == null &&
+                right.redone == null &&
+                content.MergeWith(right.content)
+            ) 
+            {
+                this.right = right.right;
+                if (this.right != null)
+                {
+                    this.right.left = this;
+                }
+                length += right.length;
+                return true;
+            }
+            return false;
         }
     }
 }

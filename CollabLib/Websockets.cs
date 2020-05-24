@@ -6,5 +6,8 @@ namespace CollabLib
 {
     public class Websockets
     {
+        public string url;
+        public Websockets(string url) { }
+
     }
 }

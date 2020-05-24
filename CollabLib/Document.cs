@@ -1,8 +1,6 @@
 ﻿using CollabLib.Struct;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace CollabLib
 {
@@ -23,7 +21,7 @@ namespace CollabLib
             transactionCleanups = new List<Transaction>();
         }
 
-        public Text AddTextField(string name)
+        public Text AddText(string name)
         {
             if (!share.ContainsKey(name))
             {
@@ -37,7 +35,7 @@ namespace CollabLib
             throw new Exception($"{name} is already defined");
         }
 
-        public Text GetTextField(string name)
+        public Text GetText(string name)
         {
             if (!share.ContainsKey(name))
             {
@@ -65,27 +63,8 @@ namespace CollabLib
             }
             finally
             {
-                foreach (var pair in transaction.afterState) {
-                    int client = pair.Key;
-                    int clock = pair.Value;
-                    int beforeClock;
-                    transaction.beforeState.TryGetValue(client, out beforeClock);
+                transaction.MergeMergeSet();
 
-                    //if (beforeClock != clock)
-                    //{
-                    //    List<Item> items;
-                    //    store.clientStates.TryGetValue(client, out items);
-                    //    int replacedItemPos = Store.FindIndex(items, clock);
-                    //    if (replacedItemPos + 1 < items.Count)
-                    //    {
-                    //        // todo try merge left replacedItemPos + 1
-                    //    }
-                    //    if (replacedItemPos > 0)
-                    //    {
-                    //        // todo try merge left replacedItemPos
-                    //    }
-                    //} 
-                }
                 Encoder encoder = new Encoder();
                 encoder.Encode(transaction);
                 if (Update != null)

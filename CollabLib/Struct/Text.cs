@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Collections;
+﻿using System.Collections.Generic;
 using CollabLib.Content;
 
 namespace CollabLib.Struct
 {
     public class Text : AbstractStruct
     {
-        public string toString()
+        public override string ToString()
         {
             List<string> chunks = new List<string>();
-            var current = this.start;
+            var current = start;
             while (current != null)
             {
                 if (!current.deleted && current.countable && current.content is ContentString)
@@ -49,12 +46,12 @@ namespace CollabLib.Struct
                 }
             }
 
-            Item right = left?.right ?? this.start;
+            Item right = left?.right ?? start;
 
             Item newItem = new Item(
                 transaction.NextID(),
                 left,
-                left != null ? new ID(left.id.client, left.id.clock + this.length - 1) : null,
+                left != null ? new ID(left.id.client, left.id.clock + length - 1) : null,
                 right,
                 right?.id,
                 this,
@@ -71,12 +68,11 @@ namespace CollabLib.Struct
             {
                 return;
             }
-            Document doc = this.doc;
             if (doc != null)
             {
                 doc.Transact((transaction) =>
                 {
-                    this.InsertTextFunc(index, text, transaction);
+                    InsertTextFunc(index, text, transaction);
                 });
             }
         }

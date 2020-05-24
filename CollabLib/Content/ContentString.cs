@@ -47,5 +47,14 @@ namespace CollabLib.Content
 
             return lengthBytes.Concat(strBytes).ToArray();
         }
+
+        public override bool MergeWith(AbstractContent right)
+        {
+            if (right is ContentString)
+            {
+                str += (right as ContentString).str;
+            }
+            return false;
+        }
     }
 }

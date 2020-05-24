@@ -99,7 +99,7 @@ namespace CollabLib
 
         public Item GetItemCleanStart(Transaction transaction, ID id)
         {
-            var items = this.clientStates[id.client];
+            var items = clientStates[id.client];
             int index = FindIndex(id);
             Item item = items[index];
 
