@@ -1,0 +1,40 @@
+﻿<Page
+    x:Class="Mindmappy.Shared.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Mindmappy.Shared"
+    xmlns:win="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <Frame x:Name="mainFrame" />
+
+        <NavigationView x:Name="menu" IsPaneOpen="False" PaneDisplayMode="LeftMinimal" IsBackButtonVisible="Collapsed" IsSettingsVisible="False">
+            <NavigationView.MenuItems>
+                <NavigationViewItem Content="Создать новый граф" x:Name="createNewGraph" />
+                <win:NavigationViewItem Content="Подключиться" x:Name="connect" />
+                <win:NavigationViewItem Content="Поделиться" x:Name="share" />
+                <win:NavigationViewItem Content="Экспортировать" x:Name="exportMenuItem" />
+                <win:NavigationViewItem Content="Импортировать" x:Name="importMenuItem" />
+            </NavigationView.MenuItems>
+        </NavigationView>
+
+        <win:ContentDialog x:Name="connectDialog" PrimaryButtonClick="OnConnect" IsPrimaryButtonEnabled="True" PrimaryButtonText="Подключиться" CloseButtonText="Отменить">
+            <StackPanel>
+                <TextBlock Margin="5">Идентификатор</TextBlock>
+                <TextBox x:Name="connectId" Margin="5" />
+            </StackPanel>
+        </win:ContentDialog>
+
+        <win:ContentDialog x:Name="shareDialog" PrimaryButtonClick="OnShare" IsPrimaryButtonEnabled="True" PrimaryButtonText="Поделиться" CloseButtonText="Отменить">
+            <StackPanel>
+                <TextBlock Margin="5">Идентификатор</TextBlock>
+                <TextBox x:Name="shareId" Margin="5" />
+            </StackPanel>
+        </win:ContentDialog>
+
+    </Grid>
+</Page>

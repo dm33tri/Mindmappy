@@ -149,9 +149,6 @@
     <UseDotNetNativeToolchain>true</UseDotNetNativeToolchain>
   </PropertyGroup>
   <ItemGroup>
-    <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -169,6 +166,11 @@
     <Content Include="Assets\Wide310x150Logo.scale-200.png" />
     <None Include="Package.StoreAssociation.xml" />
     <Content Include="Properties\Default.rd.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="CollabLib">
+      <HintPath>..\CollabLib\bin\Debug\uap10.0.16299\CollabLib.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Import Project="..\Mindmappy.Shared\Mindmappy.Shared.projitems" Label="Shared" Condition="Exists('..\Mindmappy.Shared\Mindmappy.Shared.projitems')" />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">

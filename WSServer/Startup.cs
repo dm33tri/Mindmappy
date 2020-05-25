@@ -47,7 +47,7 @@ namespace EchoApp
 
             app.Use(async (context, next) =>
             {
-                if (context.Request.Path == "/ws")
+                if (context.Request.Path.ToString().StartsWith("/doc"))
                 {
                     if (context.WebSockets.IsWebSocketRequest)
                     {

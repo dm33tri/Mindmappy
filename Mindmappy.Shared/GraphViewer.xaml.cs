@@ -10,6 +10,7 @@ using Microsoft.Msagl.Miscellaneous;
 using MSAGLNode = Microsoft.Msagl.Core.Layout.Node;
 using MSAGLPoint = Microsoft.Msagl.Core.Geometry.Point;
 using Mindmappy.Shared;
+using CollabLib;
 
 namespace Mindmappy
 {
@@ -17,6 +18,8 @@ namespace Mindmappy
 
     public sealed partial class GraphViewer : INotifyPropertyChanged
     {
+        public Websockets connection;
+
         private UIEdge selectedEdge;
         public UIEdge SelectedEdge
         {
@@ -76,7 +79,7 @@ namespace Mindmappy
 
         public Canvas Canvas { get => canvas; }
 
-        public static Edge CreateEdge(Node source, Node target)
+        public static Edge CreateEdge(MSAGLNode source, MSAGLNode target)
         {
             return new Edge(source, target);
         }
@@ -94,7 +97,7 @@ namespace Mindmappy
 
             for (int i = 0; i < 5; i++)
             {
-                Node node = CreateNode(i);
+                MSAGLNode node = CreateNode(i);
                 allNodes[i] = node;
                 graph.Nodes.Add(node);
                 for (int j = 0; j < i; ++j)
@@ -135,6 +138,7 @@ namespace Mindmappy
 
         public GraphViewer()
         {
+            //connection = new Websockets(new Document(), "ws://localhost:32770/doc/0");
             graph = GetGraph();
             layoutSettings = new FastIncrementalLayoutSettings
             {

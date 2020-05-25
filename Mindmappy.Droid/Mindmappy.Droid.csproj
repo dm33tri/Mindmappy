@@ -108,6 +108,12 @@
   <ItemGroup>
     <AndroidResource Include="Resources\values\Styles.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CollabLib\CollabLib.csproj">
+      <Project>{5a68ccae-fe84-416f-9cb3-da9767a0666f}</Project>
+      <Name>CollabLib</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="..\Mindmappy.Shared\Mindmappy.Shared.projitems" Label="Shared" Condition="Exists('..\Mindmappy.Shared\Mindmappy.Shared.projitems')" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <!-- This will force the generation of the APK when not building inside visual studio -->
