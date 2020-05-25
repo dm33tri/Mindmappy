@@ -1,7 +1,10 @@
 ﻿using CollabLib.Content;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using CollabLib.Struct;
+using Array = CollabLib.Struct.Array;
 
 namespace CollabLib
 {
@@ -45,9 +48,33 @@ namespace CollabLib
             return value;
         }
 
+        public ContentBinary ReadContentBinary()
+        {
+            int length = ReadInt();
+            byte[] value = data.Skip(index).Take(length).ToArray();
+            index += length;
+            return new ContentBinary(value);
+        }
+
         public ContentString ReadContentString()
         {
             return new ContentString(ReadString());
+        }
+
+        public AbstractStruct ReadStruct()
+        {
+            var type = ReadByte();
+            switch (type)
+            {
+                case Text.ContentTypeRef:
+                    return new Text();
+                case Array.ContentTypeRef:
+                    return new Array();
+                case Map.ContentTypeRef:
+                    return new Map();
+                default:
+                    return null;
+            }
         }
 
         public AbstractContent ReadContent(byte info)
@@ -56,6 +83,10 @@ namespace CollabLib
             {
                 case ContentString.ContentRef:
                     return ReadContentString();
+                case ContentBinary.ContentRef:
+                    return ReadContentBinary();
+                case AbstractStruct.ContentRef:
+                    return ReadStruct();
                 default:
                     return null;
             }

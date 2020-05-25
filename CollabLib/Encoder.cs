@@ -141,9 +141,9 @@ namespace CollabLib
             data.AddRange(BitConverter.GetBytes(items.Count - start));
             count += 4;
             count += WriteID(new ID(client, clock));
-            count += Encode(items[0], clock - items[0].id.clock);
+            count += Encode(items[start], clock - items[start].id.clock);
 
-            for (int i = 1; i < items.Count; ++i)
+            for (int i = start + 1; i < items.Count; ++i)
             {
                 count += Encode(items[i], 0);
             }

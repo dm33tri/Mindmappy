@@ -105,7 +105,23 @@ namespace CollabLib
 
             if (item.id.clock < id.clock)
             {
-                items.Insert(index + 1, item.Split(id.clock - item.id.clock, transaction));
+                Item newItem = item.Split(id.clock - item.id.clock, transaction);
+                items.Insert(index + 1, newItem);
+                return newItem;
+            }
+
+            return item;
+        }
+
+        public Item GetItemCleanEnd(Transaction transaction, ID id)
+        {
+            var items = clientStates[id.client];
+            int index = FindIndex(id);
+            Item item = items[index];
+
+            if (id.clock != item.id.clock + item.length - 1)
+            {
+                items.Insert(index + 1, item.Split(id.clock - item.id.clock + 1, transaction));
             }
 
             return item;

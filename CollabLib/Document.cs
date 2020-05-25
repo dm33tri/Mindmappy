@@ -1,6 +1,7 @@
 ﻿using CollabLib.Struct;
 using System;
 using System.Collections.Generic;
+using Array = CollabLib.Struct.Array;
 
 namespace CollabLib
 {
@@ -35,11 +36,39 @@ namespace CollabLib
             throw new Exception($"{name} is already defined");
         }
 
+        public Array AddArray(string name)
+        {
+            if (!share.ContainsKey(name))
+            {
+                Array array = new Array();
+                array.docName = name;
+                array.Integrate(this, null);
+                share[name] = array;
+                return array;
+            }
+
+            throw new Exception($"{name} is already defined");
+        }
+
+        public Map AddMap(string name)
+        {
+            if (!share.ContainsKey(name))
+            {
+                Map map = new Map();
+                map.docName = name;
+                map.Integrate(this, null);
+                share[name] = map;
+                return map;
+            }
+
+            throw new Exception($"{name} is already defined");
+        }
+
         public Text GetText(string name)
         {
             if (!share.ContainsKey(name))
             {
-                throw new Exception($"{name} is not defined");
+                return AddText(name);
             }
             if (share[name] is Text)
             {
@@ -48,6 +77,35 @@ namespace CollabLib
 
             throw new Exception($"{name} is not a Text instance");
         }
+
+        public Array GetArray(string name)
+        {
+            if (!share.ContainsKey(name))
+            {
+                return AddArray(name);
+            }
+            if (share[name] is Array)
+            {
+                return share[name] as Array;
+            }
+
+            throw new Exception($"{name} is not an Array instance");
+        }
+
+        public Map GetMap(string name)
+        {
+            if (!share.ContainsKey(name))
+            {
+                return AddMap(name);
+            }
+            if (share[name] is Map)
+            {
+                return share[name] as Map;
+            }
+
+            throw new Exception($"{name} is not a Map instance");
+        }
+
 
         public event UpdateHandler Update;
 

@@ -24,25 +24,31 @@ namespace CollabLib.Struct
 
         public void InsertTextFunc(int index, string text, Transaction transaction)
         {
-            Item left = start;
+            Item left = null;
 
             // find insert position
-            for (; left != null && index > 0; left = left.right)
+
+            if (index != 0)
             {
-                if (!left.deleted && left.countable)
+                left = start;
+
+                for (; left != null && index > 0; left = left.right)
                 {
-                    if (index <= left.length)
+                    if (!left.deleted && left.countable)
                     {
-                        // split item
-                        if (index < left.length)
+                        if (index <= left.length)
                         {
-                            transaction.doc.store.GetItemCleanStart(transaction, new ID(left.id.client, left.id.clock + index));
+                            // split item
+                            if (index < left.length)
+                            {
+                                transaction.doc.store.GetItemCleanStart(transaction, new ID(left.id.client, left.id.clock + index));
+                            }
+
+                            break;
                         }
 
-                        break;
+                        index -= left.length;
                     }
-
-                    index -= left.length;
                 }
             }
 
@@ -51,7 +57,7 @@ namespace CollabLib.Struct
             Item newItem = new Item(
                 transaction.NextID(),
                 left,
-                left != null ? new ID(left.id.client, left.id.clock + length - 1) : null,
+                left != null ? new ID(left.id.client, left.id.clock + left.length - 1) : null,
                 right,
                 right?.id,
                 this,
@@ -82,6 +88,7 @@ namespace CollabLib.Struct
 
         }
 
-        public override int TypeRef { get; } = 1; 
+        public const int ContentTypeRef = 2;
+        public override int TypeRef { get => ContentTypeRef; }
     }
 }

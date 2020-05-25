@@ -58,7 +58,7 @@ namespace CollabLib
                 length -= offset;
             }
 
-            Item left = this.left != null ? store.GetItemCleanStart(transaction, this.left) : null;
+            Item left = this.left != null ? store.GetItemCleanEnd(transaction, this.left) : null;
             Item right = this.right != null ? store.GetItemCleanStart(transaction, this.right) : null;
             AbstractStruct parent = null;
             string parentKey = this.parentKey;

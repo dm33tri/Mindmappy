@@ -62,7 +62,14 @@ namespace CollabLib
 
             if (rightItem.parentKey != null && rightItem.right == null)
             {
-                rightItem.parent.map[rightItem.parentKey] = rightItem;
+                if (rightItem.parent.map.ContainsKey(rightItem.parentKey))
+                {
+                    rightItem.parent.map[rightItem.parentKey] = rightItem;
+                }
+                else
+                {
+                    rightItem.parent.map.Add(rightItem.parentKey, rightItem);
+                }
             }
 
             length = index;
@@ -81,7 +88,7 @@ namespace CollabLib
             } 
             else if (parentKey != null)
             {
-                conflictingItem = parent.map[parentKey];
+                parent.map.TryGetValue(parentKey, out conflictingItem);
                 while (conflictingItem != null && conflictingItem.left != null)
                 {
                     conflictingItem = conflictingItem.left;
@@ -123,11 +130,11 @@ namespace CollabLib
             }
             else
             {
-                Item right;
+                Item right = null;
 
                 if (parentKey != null)
                 {
-                    right = parent.map[parentKey];
+                    parent.map.TryGetValue(parentKey, out right);
                     while (right != null && right.left != null)
                     {
                         right = right.left;
@@ -148,7 +155,14 @@ namespace CollabLib
             }
             else if (parentKey != null)
             {
-                parent.map[parentKey] = this;
+                if (!parent.map.ContainsKey(parentKey))
+                {
+                    parent.map.Add(parentKey, this);
+                }
+                else
+                {
+                    parent.map[parentKey] = this;
+                }
 
                 if (left != null)
                 {

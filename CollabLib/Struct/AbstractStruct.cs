@@ -31,7 +31,8 @@ namespace CollabLib.Struct
 
         public override bool Countable { get; } = true;
         public override int Length { get; } = 1;
-        public override int Ref { get; } = 7;
+        public const int ContentRef = 7;
+        public override int Ref { get => ContentRef; }
         public override void Integrate(Transaction transaction, Item item)
         {
             Integrate(transaction.doc, item);
