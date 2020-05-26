@@ -11,6 +11,7 @@ using MSAGLNode = Microsoft.Msagl.Core.Layout.Node;
 using MSAGLPoint = Microsoft.Msagl.Core.Geometry.Point;
 using Mindmappy.Shared;
 using CollabLib;
+using System.Diagnostics;
 
 namespace Mindmappy
 {
@@ -86,18 +87,18 @@ namespace Mindmappy
 
         public static MSAGLNode CreateNode(int id)
         {
-            return new MSAGLNode(CurveFactory.CreateRectangle(150, 60, new MSAGLPoint(0, 0)), id);
+            return new MSAGLNode(CurveFactory.CreateRectangle(150, 60, new MSAGLPoint(0, 0)));
         }
 
         public GeometryGraph GetGraph()
         {
             GeometryGraph graph = new GeometryGraph();
-
             MSAGLNode[] allNodes = new MSAGLNode[5];
 
             for (int i = 0; i < 5; i++)
             {
                 MSAGLNode node = CreateNode(i);
+                CollabBinding.Binding.AddNode(node);
                 allNodes[i] = node;
                 graph.Nodes.Add(node);
                 for (int j = 0; j < i; ++j)

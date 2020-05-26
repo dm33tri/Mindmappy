@@ -120,7 +120,7 @@ namespace CollabLib.Tests
             doc.clientId = 0;
             var array = doc.AddArray("array");
             var map = new Map();
-            var text2 = new Text();
+            var text = new Text();
 
             doc.Update += (doc, data) =>
             {
@@ -128,9 +128,9 @@ namespace CollabLib.Tests
             };
 
             array.Insert(0, map);
-            map.Set("text", text2);
-            text2.InsertText(0, "ABEF");
-            text2.InsertText(2, "CD");
+            map.Set("text", text);
+            text.InsertText(0, "ABEF");
+            text.InsertText(2, "CD");
 
             Assert.Equal("ABCDEF", ((doc2.GetArray("array")[0] as Map).Get("text") as Text).ToString());
         }

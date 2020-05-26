@@ -73,6 +73,11 @@ namespace CollabLib.Struct
         public const int ContentTypeRef = 0;
         public override int TypeRef { get => ContentTypeRef; }
 
+        public void Push(AbstractContent content)
+        {
+            Insert(length, content);
+        } 
+
         public AbstractContent this[int i]
         {
             get

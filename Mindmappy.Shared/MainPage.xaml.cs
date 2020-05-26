@@ -27,17 +27,17 @@ namespace Mindmappy.Shared
 
         private async Task OnExport()
         {
-            var picker = new FileSavePicker();
-            picker.FileTypeChoices.Add("dot", new List<string>() { ".dot" });
-            picker.FileTypeChoices.Add("SVG", new List<string>() { ".svg" });
-            StorageFile file = await picker.PickSaveFileAsync();
+            //var picker = new FileSavePicker();
+            //picker.FileTypeChoices.Add("dot", new List<string>() { ".dot" });
+            //picker.FileTypeChoices.Add("SVG", new List<string>() { ".svg" });
+            //StorageFile file = await picker.PickSaveFileAsync();
         }
 
         private async Task OnImport()
         {
-            var picker = new FileOpenPicker();
-            picker.FileTypeFilter.Add(".dot");
-            StorageFile file = await picker.PickSingleFileAsync();
+            //var picker = new FileOpenPicker();
+            //picker.FileTypeFilter.Add(".dot");
+            //StorageFile file = await picker.PickSingleFileAsync();
         }
 
         private async void Menu_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
@@ -48,12 +48,12 @@ namespace Mindmappy.Shared
                 case "Создать новый граф":
                     mainFrame.Navigate(typeof(GraphViewer));
                     break;
-                case "Подключиться":
-                    await connectDialog.ShowAsync();
-                    break;
-                case "Поделиться":
-                    await shareDialog.ShowAsync();
-                    break;
+                //case "Подключиться":
+                //    await connectDialog.ShowAsync();
+                //    break;
+                //case "Поделиться":
+                //    await shareDialog.ShowAsync();
+                //    break;
                 case "Экспортировать":
                     await OnExport();
                     break;

@@ -5,8 +5,11 @@ using System.Text;
 
 namespace CollabLib.Struct
 {
+    public delegate void StructUpdateHandler(AbstractStruct sender, string[] changedKeys);
+
     public abstract class AbstractStruct : AbstractContent
     {
+        public event StructUpdateHandler Update;
         public Document doc;
         public string docName;
         public ID id;
@@ -48,6 +51,13 @@ namespace CollabLib.Struct
         public override byte[] Encode(int offset)
         {
             return new[] { (byte)TypeRef };
+        }
+
+        public virtual void TriggerUpdate(string[] keys) {
+            if (Update != null)
+            {
+                Update(this, keys);
+            }
         }
     }
 }

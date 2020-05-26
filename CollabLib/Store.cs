@@ -198,7 +198,7 @@ namespace CollabLib
                 {
                     if (offset < itemRef.length)
                     {
-                        itemRef.ToItem(transaction, this, offset).Integrate(transaction);
+                        itemRef.ToItem(transaction, this, offset)?.Integrate(transaction);
                     }
                     pendingStack.RemoveAt(pendingStack.Count - 1);
                 } 

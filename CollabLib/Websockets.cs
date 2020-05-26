@@ -19,23 +19,43 @@ namespace CollabLib
         ClientWebSocket client;
         CancellationTokenSource cancel;
         Document doc;
+        string url;
+
         public Websockets(Document doc, string url) {
             client = new ClientWebSocket();
             this.doc = doc;
+            this.url = url;
             doc.Update += (sender, changes) => Doc_Update(sender, changes);
             cancel = new CancellationTokenSource();
-            Connect(url);
+        }
+
+        public async Task<int> GetId()
+        {
+            var buffer = new ArraySegment<byte>(new byte[4096]);
+
+            if (client.State == WebSocketState.Open)
+            {
+                await client.ReceiveAsync(buffer, cancel.Token);
+            }
+
+            return BitConverter.ToInt32(buffer.Array, 0);
         }
 
         private async Task Doc_Update(Document sender, byte[] changes)
         {
-            await client.SendAsync(new ArraySegment<byte>(changes), WebSocketMessageType.Binary, true, cancel.Token);
+            if (client.State == WebSocketState.Open)
+            {
+                client.SendAsync(new ArraySegment<byte>(changes), WebSocketMessageType.Binary, true, cancel.Token);
+            }
         }
 
-        public async Task Connect(string url)
+        public async Task Connect()
         {
             await client.ConnectAsync(new Uri(url), cancel.Token);
-            Listen();
+            if (client.State == WebSocketState.Open)
+            {
+                await client.SendAsync(new ArraySegment<byte>(doc.EncodeState()), WebSocketMessageType.Binary, true, cancel.Token);
+            }
         }
 
         public async Task Listen()

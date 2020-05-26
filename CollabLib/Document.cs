@@ -1,6 +1,7 @@
 ﻿using CollabLib.Struct;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Array = CollabLib.Struct.Array;
 
 namespace CollabLib
@@ -118,6 +119,10 @@ namespace CollabLib
             {
                 this.transaction = null;
                 transaction.afterState = store.StateVector;
+                foreach (var pair in transaction.changed)
+                {
+                    pair.Key.TriggerUpdate(pair.Value.ToArray());
+                }
             }
             finally
             {
@@ -169,6 +174,13 @@ namespace CollabLib
             {
                 decoder.ReadItems(transaction, store);
             });
+        }
+
+        public byte[] EncodeState()
+        {
+            var encoder = new Encoder();
+            encoder.Encode(store, new Dictionary<int, int>() { { 0, 0 } });
+            return encoder.Data;
         }
     }
 }
