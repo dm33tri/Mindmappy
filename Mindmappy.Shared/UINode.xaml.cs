@@ -6,9 +6,11 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI;
+using Microsoft.Msagl.Core;
 using Microsoft.Msagl.Core.Layout;
 using Microsoft.Msagl.Miscellaneous;
 using Microsoft.Msagl.Layout.Incremental;
+using Microsoft.Msagl.Layout.Initial;
 using MSAGLPoint = Microsoft.Msagl.Core.Geometry.Point;
 using MSAGLNode = Microsoft.Msagl.Core.Layout.Node;
 
@@ -21,7 +23,7 @@ namespace Mindmappy.Shared
         public GraphViewer ParentPage { get; set; }
         public GeometryGraph Graph { get; set; }
         public FastIncrementalLayoutSettings LayoutSettings { get; set; }
-
+        public CancelToken CancelToken { get; set; }
         public double Top { get => Node?.BoundingBox.Bottom ?? 0; }
         public double Left { get => Node?.BoundingBox.Left ?? 0; }
         public double NodeWidth { get => Node?.BoundingBox.Width ?? 100; }
@@ -44,13 +46,13 @@ namespace Mindmappy.Shared
 
         public Brush Stroke { get => active ? highlightBrush : defaultBrush; }
 
-        public UINode(MSAGLNode node, GraphViewer parent, GeometryGraph graph, FastIncrementalLayoutSettings settings)
+        public UINode(MSAGLNode node, GraphViewer parent, GeometryGraph graph, FastIncrementalLayoutSettings settings, CancelToken cancelToken)
         {
             Node = node;
             ParentPage = parent;
             Graph = graph;
             LayoutSettings = settings;
-
+            CancelToken = cancelToken;
             InitializeComponent();
 
             Tapped += OnTapped;
@@ -64,6 +66,7 @@ namespace Mindmappy.Shared
 
         private void ResizePoint_ManipulationDelta(object sender, ManipulationDeltaRoutedEventArgs e)
         {
+            CancelToken.Canceled = true;
             e.Handled = true;
             var delta = new MSAGLPoint(e.Delta.Translation.X, e.Delta.Translation.Y);
 
@@ -88,13 +91,28 @@ namespace Mindmappy.Shared
             }
             OnPropertyChanged("NodeWidth");
             OnPropertyChanged("NodeHeight");
-            LayoutHelpers.RouteAndLabelEdges(Graph, LayoutSettings, Graph.Edges);
+            var layout = new Relayout(
+                Graph,
+                new MSAGLNode[] { Node },
+                new MSAGLNode[] {},
+                (cluster) => LayoutSettings
+            );
+            CancelToken.Canceled = false;
+            layout.Run(CancelToken);
         }
 
         private void UINode_ManipulationDelta(object sender, ManipulationDeltaRoutedEventArgs e)
         {
+            CancelToken.Canceled = true;
             e.Handled = true;
-            var delta = new MSAGLPoint(e.Delta.Translation.X, e.Delta.Translation.Y);
+            var delta = new MSAGLPoint(
+                e.Delta.Translation.X,
+#if __MACOS__ || __IOS__
+                -e.Delta.Translation.Y // on Mac delta is reversed
+#else
+                e.Delta.Translation.Y
+#endif
+            );
             Node.Center += delta;
 
             if (Node.BoundingBox.Right >= ParentPage.CanvasWidth - 20)
@@ -107,7 +125,14 @@ namespace Mindmappy.Shared
             }
             OnPropertyChanged("Left");
             OnPropertyChanged("Top");
-            LayoutHelpers.RouteAndLabelEdges(Graph, LayoutSettings, Graph.Edges);
+            var layout = new Relayout(
+                Graph,
+                new MSAGLNode[] { Node },
+                new MSAGLNode[] { },
+                (cluster) => LayoutSettings
+            );
+            CancelToken.Canceled = false;
+            layout.Run(CancelToken);
         }
 
         private void Unfocus()

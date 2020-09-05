@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="MSBuild.Sdk.Extras/2.0.54">
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;netstandard2.0;monoandroid90;uap10.0.16299</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;netstandard2.0;monoandroid90;</TargetFrameworks>
     <!-- Ensures the .xr.xml files are generated in a proper layout folder -->
     <GenerateLibraryLayout>true</GenerateLibraryLayout>
   </PropertyGroup>
@@ -18,7 +18,7 @@
     <UpToDateCheckInput Include="**\*.xaml" Exclude="bin\**\*.xaml;obj\**\*.xaml" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="System.Net.WebSockets.Client" Version="4.3.2" />
-    <PackageReference Include="Uno.Wasm.WebSockets" Version="1.0.0-dev.32" />
+    <PackageReference Include="Uno.Wasm.WebSockets" Version="1.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="3.1.7" />
   </ItemGroup>
 </Project>
