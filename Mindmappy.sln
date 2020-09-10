@@ -31,11 +31,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mindmappy.iOS", "Mindmappy.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mindmappy.macOS", "Mindmappy.macOS\Mindmappy.macOS.csproj", "{0AF1F9FE-8659-41EE-88A1-2D47986F3C2B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mindmappy.Service", "Mindmappy.Service\Mindmappy.Service.csproj", "{380275CD-74D4-4721-8E1C-23B61033885B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mindmappy.Service", "Mindmappy.Service\Mindmappy.Service.csproj", "{380275CD-74D4-4721-8E1C-23B61033885B}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Mindmappy.Shared\Mindmappy.Shared.projitems*{0af1f9fe-8659-41ee-88a1-2d47986f3c2b}*SharedItemsImports = 4
 		Mindmappy.Shared\Mindmappy.Shared.projitems*{1dc70c07-b8ae-4ce0-ac76-29d8e395d650}*SharedItemsImports = 4
+		Mindmappy.Shared\Mindmappy.Shared.projitems*{476d3291-3eaa-4309-8681-357e0d32b8dc}*SharedItemsImports = 4
 		Mindmappy.Shared\Mindmappy.Shared.projitems*{6279c845-92f8-4333-ab99-3d213163593c}*SharedItemsImports = 13
 		Mindmappy.Shared\Mindmappy.Shared.projitems*{9b1fca63-d819-4ff2-b8f8-e4954e675f89}*SharedItemsImports = 4
 		Mindmappy.Shared\Mindmappy.Shared.projitems*{ca9beff6-28e1-49b3-97ce-dca6742583fd}*SharedItemsImports = 5
