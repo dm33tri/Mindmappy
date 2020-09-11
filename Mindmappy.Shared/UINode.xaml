@@ -18,6 +18,16 @@
             <ColumnDefinition Width="{Binding Path=NodeWidth}" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
+        <Rectangle x:Name="background" 
+            Grid.Column="0"
+            Width="{Binding Path=NodeWidth}"
+            Height="{Binding Path=NodeHeight}" 
+            Fill="Blue"
+            Stroke="{Binding Path=Stroke}"
+            StrokeThickness="3"
+            IsHitTestVisible="False"
+            VerticalAlignment="Stretch" 
+            HorizontalAlignment="Stretch" />
         <TextBox
             x:Name="textBox"
             Grid.Column="0"
@@ -31,24 +41,13 @@
             TextAlignment="Center"
             Background="White"
             BorderThickness="0"
-            Text="{Binding Path=Label, Mode=TwoWay}">
-        </TextBox>
-        <Rectangle x:Name="background" 
-            Grid.Column="0"
-            Width="{Binding Path=NodeWidth}"
-            Height="{Binding Path=NodeHeight}" 
-            Fill="Transparent"
-            Stroke="{Binding Path=Stroke}"
-            StrokeThickness="3"
-            IsHitTestVisible="False"
-            VerticalAlignment="Stretch" 
-            HorizontalAlignment="Stretch" />
+            Text="{Binding Path=Label, Mode=TwoWay}" />
         <Rectangle 
             x:Name="overlay" 
             Grid.Column="0"
             Width="{Binding Path=NodeWidth}"
             Height="{Binding Path=NodeHeight}" 
-            Fill="Transparent" 
+            Fill="Red" 
             VerticalAlignment="Stretch" 
             HorizontalAlignment="Stretch" />
         <StackPanel Grid.Column="1">

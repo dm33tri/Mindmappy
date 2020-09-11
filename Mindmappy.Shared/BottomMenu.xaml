@@ -1,0 +1,31 @@
+﻿<Page
+    x:Class="Mindmappy.Shared.BottomMenu"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Mindmappy.Shared"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+    <StackPanel Orientation="Horizontal" Grid.Row="1" Background="LightGray">
+        <AppBarButton x:Name="addNodeButton" Label="Добавить вершину">
+            <AppBarButton.Icon>
+                <FontIcon FontFamily="Segoe UI Emoji" Glyph="➕"/>
+            </AppBarButton.Icon>
+        </AppBarButton>
+        <AppBarButton Visibility="Collapsed" x:Name="addEdgeButton" Label="Добавить ребро">
+            <AppBarButton.Icon>
+                <FontIcon FontFamily="Segoe UI Emoji" Glyph="🔗"/>
+            </AppBarButton.Icon>
+        </AppBarButton>
+        <AppBarButton Visibility="Collapsed" x:Name="removeNodeButton" Label="Удалить вершину">
+            <AppBarButton.Icon>
+                <FontIcon FontFamily="Segoe UI Emoji" Glyph="❌"/>
+            </AppBarButton.Icon>
+        </AppBarButton>
+        <AppBarButton Visibility="{Binding Path=IsEdgeSelected}" x:Name="removeEdgeButton" Label="Удалить ребро">
+            <AppBarButton.Icon>
+                <FontIcon FontFamily="Segoe UI Emoji" Glyph="❌"/>
+            </AppBarButton.Icon>
+        </AppBarButton>
+    </StackPanel>
+</Page>

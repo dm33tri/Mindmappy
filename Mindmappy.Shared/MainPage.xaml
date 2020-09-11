@@ -21,20 +21,5 @@
                 <win:NavigationViewItem Content="Импортировать" x:Name="importMenuItem" />
             </NavigationView.MenuItems>
         </NavigationView>
-
-        <win:ContentDialog x:Name="connectDialog" PrimaryButtonClick="OnConnect" IsPrimaryButtonEnabled="True" PrimaryButtonText="Подключиться" CloseButtonText="Отменить">
-            <StackPanel>
-                <TextBlock Margin="5">Идентификатор</TextBlock>
-                <TextBox x:Name="connectId" Margin="5" />
-            </StackPanel>
-        </win:ContentDialog>
-
-        <win:ContentDialog x:Name="shareDialog" PrimaryButtonClick="OnShare" IsPrimaryButtonEnabled="True" PrimaryButtonText="Поделиться" CloseButtonText="Отменить">
-            <StackPanel>
-                <TextBlock Margin="5">Идентификатор</TextBlock>
-                <TextBox x:Name="shareId" Margin="5" />
-            </StackPanel>
-        </win:ContentDialog>
-
     </Grid>
 </Page>

@@ -11,11 +11,6 @@ using Microsoft.Msagl.Miscellaneous;
 using MSAGLNode = Microsoft.Msagl.Core.Layout.Node;
 using MSAGLPoint = Microsoft.Msagl.Core.Geometry.Point;
 using Mindmappy.Shared;
-using CollabLib;
-using System.Diagnostics;
-using SkiaSharp;
-using MSAGLLineSegment = Microsoft.Msagl.Core.Geometry.Curves.LineSegment;
-using System.Threading.Tasks;
 
 namespace Mindmappy
 {
@@ -40,6 +35,7 @@ namespace Mindmappy
         public UIEdge CursorEdge { get; set; }
         public void AddCursorNode(UINode origin)
         {
+            var graph = Controller.Graph;
             var tempNode = new MSAGLNode(CurveFactory.CreateRectangle(1, 1, new MSAGLPoint(0, 0)));
             var tempEdge = new Edge(origin.Node, tempNode);
             graph.Nodes.Add(tempNode);
@@ -64,6 +60,7 @@ namespace Mindmappy
 
         public void AttachEdge(UINode node)
         {
+            var graph = Controller.Graph;
             var origin = CursorEdge.Edge.Source;
 
             canvas.PointerMoved -= cursor.OnPointerMoved;
@@ -82,100 +79,48 @@ namespace Mindmappy
         }
 
         public Canvas Canvas { get => canvas; }
-
-        public static Edge CreateEdge(MSAGLNode source, MSAGLNode target)
-        {
-            return new Edge(source, target);
-        }
-
-        public static MSAGLNode CreateNode(int id)
-        {
-            return new MSAGLNode(CurveFactory.CreateRectangle(150, 60, new MSAGLPoint(0, 0)));
-        }
-
-        public GeometryGraph GetGraph()
-        {
-            GeometryGraph graph = new GeometryGraph();
-            MSAGLNode[] allNodes = new MSAGLNode[5];
-
-            for (int i = 0; i < 5; i++)
-            {
-                MSAGLNode node = CreateNode(i);
-                allNodes[i] = node;
-                graph.Nodes.Add(node);
-                for (int j = 0; j < i; ++j)
-                {
-                    graph.Edges.Add(CreateEdge(allNodes[j], allNodes[i]));
-                }
-            }
-
-            return graph;
-        }
-
-        public GeometryGraph graph;
+        public Controller Controller { get; set; } = new Controller();
         public InitialLayout layout;
         public FastIncrementalLayoutSettings layoutSettings;
 
         public void DrawNodes()
         {
-            foreach (var node in graph.Nodes)
+            foreach (var node in Controller.Graph.Nodes)
             {
-                new UINode(node, this, graph, layoutSettings, cancelToken);
+                new UINode { Node = node, Controller = Controller, ParentPage = this };
             }
-        }
-
-        public void DrawEdges()
-        {
-            //foreach (var edge in graph.Edges)
-            //{
-            //    new UIEdge(edge, this, graph);
-            //}
-        }
-
-        public void NormalizeGraph()
-        {
-            MSAGLPoint center = new MSAGLPoint(canvas.Width / 2, canvas.Height / 2);
-            graph.Translate(center - graph.BoundingBox.Center);
-            graph.UpdateBoundingBox();
         }
 
         public GraphViewer()
         {
-            graph = GetGraph();
+            var graph = Controller.Graph;
             layoutSettings = new FastIncrementalLayoutSettings
             {
                 NodeSeparation = 64,
                 AvoidOverlaps = true,
                 MinConstraintLevel = 1,
-
             };
             layout = new InitialLayout(graph, layoutSettings);
             layout.SingleComponent = true;
-            graph.AlgorithmData = layout;
             layout.Run();
             LayoutHelpers.RouteAndLabelEdges(graph, layoutSettings, graph.Edges);
 
             InitializeComponent();
-            AnimationLoop();
+            edgesSurface.Controller = Controller;
 #if __ANDROID__ || __WASM__
             canvas.PointerPressed += OnResetFocus;
 #else
             canvas.Tapped += OnResetFocus;
 #endif
             canvas.Tapped += OnTapped;
-            canvasGrid.SizeChanged += InitView;
-            addNodeButton.Click += AddNode;
-            removeEdgeButton.Click += RemoveEdge;
+            mainGrid.SizeChanged += MainGrid_SizeChanged;
+            DrawNodes();
+            // TODO
+            //addNodeButton.Click += AddNode;
+            //removeEdgeButton.Click += RemoveEdge;
         }
 
-        async Task AnimationLoop()
-        {
-            while (true)
-            {
-                skiaView.Invalidate();
-                await Task.Delay(System.TimeSpan.FromSeconds(1.0 / 30));
-            }
-        }
+       
 
         private double offsetX;
         public double OffsetX
@@ -230,28 +175,23 @@ namespace Mindmappy
             Unfocus();
         }
 
-        private void InitView(object sender, SizeChangedEventArgs e)
+        private void MainGrid_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            if (canvasGrid.ActualHeight > 0 && canvasGrid.ActualWidth > 0)
+            if (mainGrid.ActualHeight > 0 && mainGrid.ActualWidth > 0)
             {
-                CanvasWidth = canvasGrid.ActualWidth;
-                CanvasHeight = canvasGrid.ActualHeight;
-                NormalizeGraph();
-                DrawEdges();
-                DrawNodes();
+                CanvasWidth = mainGrid.ActualWidth;
+                CanvasHeight = mainGrid.ActualHeight;
             }
-
-            canvasGrid.SizeChanged -= InitView;
         }
 
         public void AddNode(object sender, RoutedEventArgs e)
         {
-            var node = new MSAGLNode(
-                CurveFactory.CreateRectangle(150, 60, new MSAGLPoint(canvas.Width / 2, canvas.Height / 2)),
-                graph.Nodes.Count
-            );
-            graph.RootCluster.AddChild(node);
-            new UINode(node, this, graph, layoutSettings, cancelToken).Focus();
+            //var node = new MSAGLNode(
+            //    CurveFactory.CreateRectangle(150, 60, new MSAGLPoint(canvas.Width / 2, canvas.Height / 2)),
+            //    graph.Nodes.Count
+            //);
+            //graph.RootCluster.AddChild(node);
+            //new UINode(node, this, graph, layoutSettings, cancelToken).Focus();
         }
 
         public void RemoveEdge(object sender, RoutedEventArgs e)
@@ -264,79 +204,6 @@ namespace Mindmappy
         void OnPropertyChanged(string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        SKPaint linePaint = new SKPaint
-        {
-            Color = SKColors.Black,
-            Style = SKPaintStyle.Stroke,
-            StrokeWidth = 3
-        };
-
-        void PaintEdges(SKCanvas canvas)
-        {
-            foreach (Edge edge in graph.Edges)
-            {
-                var curve = edge.Curve;
-
-                if (curve is Curve)
-                {
-                    for (int i = 0; i < (curve as Curve).Segments.Count; ++i)
-                    {
-                        ICurve segment = (curve as Curve).Segments[i];
-                        if (segment is MSAGLLineSegment)
-                        {
-                            var s = segment as MSAGLLineSegment;
-                            canvas.DrawLine(
-                                (float)s[0].X,
-                                (float)s[0].Y,
-                                (float)s[1].X,
-                                (float)s[1].Y,
-                                linePaint
-                            );
-                        }
-                        else if (segment is CubicBezierSegment)
-                        {
-                            var s = segment as CubicBezierSegment;
-                            using (SKPath path = new SKPath())
-                            {
-                                path.MoveTo((float)s.B(0).X, (float)s.B(0).Y);
-                                path.CubicTo(
-                                    (float)s.B(1).X,
-                                    (float)s.B(1).Y,
-                                    (float)s.B(2).X,
-                                    (float)s.B(2).Y,
-                                    (float)s.B(3).X,
-                                    (float)s.B(3).Y
-                                );
-
-                                canvas.DrawPath(path, linePaint);
-                            }
-                        }
-                    }
-                }
-                else if (curve is MSAGLLineSegment)
-                {
-                    var s = curve as MSAGLLineSegment;
-                    canvas.DrawLine(
-                        (float)s[0].X,
-                        (float)s[0].Y,
-                        (float)s[1].X,
-                        (float)s[1].Y,
-                        linePaint
-                    );
-                }
-            }
-        }
-
-        void SKXamlCanvas_PaintSurface(System.Object sender, SkiaSharp.Views.UWP.SKPaintSurfaceEventArgs e)
-        {
-            var canvas = e.Surface.Canvas;
-            var info = e.Info;
-            var scale = info.Width / skiaView.Width;
-            canvas.Scale((float)scale);
-            canvas.Clear();
-            PaintEdges(canvas);
         }
     }
 }

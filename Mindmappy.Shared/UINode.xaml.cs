@@ -21,9 +21,6 @@ namespace Mindmappy.Shared
         public string Label { get; set; }
         public MSAGLNode Node { get; set; }
         public GraphViewer ParentPage { get; set; }
-        public GeometryGraph Graph { get; set; }
-        public FastIncrementalLayoutSettings LayoutSettings { get; set; }
-        public CancelToken CancelToken { get; set; }
         public double Top { get => Node?.BoundingBox.Bottom ?? 0; }
         public double Left { get => Node?.BoundingBox.Left ?? 0; }
         public double NodeWidth { get => Node?.BoundingBox.Width ?? 100; }
@@ -46,27 +43,15 @@ namespace Mindmappy.Shared
 
         public Brush Stroke { get => active ? highlightBrush : defaultBrush; }
 
-        public UINode(MSAGLNode node, GraphViewer parent, GeometryGraph graph, FastIncrementalLayoutSettings settings, CancelToken cancelToken)
-        {
-            Node = node;
-            ParentPage = parent;
-            Graph = graph;
-            LayoutSettings = settings;
-            CancelToken = cancelToken;
-            InitializeComponent();
+        public Controller Controller { get; set; }
 
-            Tapped += OnTapped;
-            removeButton.Tapped += OnRemoveClick;
-            addEdgeButton.Tapped += OnAddEdgeClick;
-            ParentPage.Unfocus += Unfocus;
-            ParentPage.Canvas.Children.Add(this);
-            ManipulationDelta += UINode_ManipulationDelta;
-            resizePoint.ManipulationDelta += ResizePoint_ManipulationDelta;
+        public UINode()
+        {
+
         }
 
         private void ResizePoint_ManipulationDelta(object sender, ManipulationDeltaRoutedEventArgs e)
         {
-            CancelToken.Canceled = true;
             e.Handled = true;
             var delta = new MSAGLPoint(e.Delta.Translation.X, e.Delta.Translation.Y);
 
@@ -92,18 +77,15 @@ namespace Mindmappy.Shared
             OnPropertyChanged("NodeWidth");
             OnPropertyChanged("NodeHeight");
             var layout = new Relayout(
-                Graph,
+                Controller.Graph,
                 new MSAGLNode[] { Node },
                 new MSAGLNode[] {},
-                (cluster) => LayoutSettings
+                (cluster) => Controller.LayoutSettings
             );
-            CancelToken.Canceled = false;
-            layout.Run(CancelToken);
         }
 
         private void UINode_ManipulationDelta(object sender, ManipulationDeltaRoutedEventArgs e)
         {
-            CancelToken.Canceled = true;
             e.Handled = true;
             var delta = new MSAGLPoint(
                 e.Delta.Translation.X,
@@ -115,24 +97,22 @@ namespace Mindmappy.Shared
             );
             Node.Center += delta;
 
-            if (Node.BoundingBox.Right >= ParentPage.CanvasWidth - 20)
-            {
-                ParentPage.CanvasWidth += 500;
-            }
-            if (Node.BoundingBox.Bottom >= ParentPage.CanvasHeight - 20)
-            {
-                ParentPage.CanvasHeight += 500;
-            }
+            //if (Node.BoundingBox.Right >= ParentPage.CanvasWidth - 20)
+            //{
+            //    ParentPage.CanvasWidth += 500;
+            //}
+            //if (Node.BoundingBox.Bottom >= ParentPage.CanvasHeight - 20)
+            //{
+            //    ParentPage.CanvasHeight += 500;
+            //}
             OnPropertyChanged("Left");
             OnPropertyChanged("Top");
             var layout = new Relayout(
-                Graph,
+                Controller.Graph,
                 new MSAGLNode[] { Node },
                 new MSAGLNode[] { },
-                (cluster) => LayoutSettings
+                (cluster) => Controller.LayoutSettings
             );
-            CancelToken.Canceled = false;
-            layout.Run(CancelToken);
         }
 
         private void Unfocus()
@@ -163,8 +143,8 @@ namespace Mindmappy.Shared
             {
                 (edge.UserData as UIEdge).Remove();
             }
-            Graph.Nodes.Remove(Node);
-            LayoutHelpers.RouteAndLabelEdges(Graph, LayoutSettings, Graph.Edges);
+            Controller.Graph.Nodes.Remove(Node);
+            LayoutHelpers.RouteAndLabelEdges(Controller.Graph, Controller.LayoutSettings, Controller.Graph.Edges);
             ParentPage.Canvas.Children.Remove(this);
         }
 
