@@ -80,7 +80,7 @@ namespace Mindmappy.Shared
             while (true)
             {
                 skiaView.Invalidate();
-                await Task.Delay(System.TimeSpan.FromSeconds(1.0 / 30));
+                await Task.Delay(System.TimeSpan.FromSeconds(1.0 / 60));
             }
         }
     }

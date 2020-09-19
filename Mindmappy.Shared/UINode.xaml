@@ -9,8 +9,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d android"
     DataContext="{Binding RelativeSource={RelativeSource Self}}" 
-    Canvas.Left="{Binding Path=Left}"
-    Canvas.Top="{Binding Path=Top}"
+    Canvas.Left="{Binding Path=Node.BoundingBox.Left}"
+    Canvas.Top="{Binding Path=Node.BoundingBox.Bottom}"
     ManipulationMode="TranslateX,TranslateY"
     Canvas.ZIndex="2">
     <Grid>

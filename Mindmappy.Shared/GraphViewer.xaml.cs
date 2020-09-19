@@ -87,7 +87,7 @@ namespace Mindmappy
         {
             foreach (var node in Controller.Graph.Nodes)
             {
-                new UINode { Node = node, Controller = Controller, ParentPage = this };
+                canvas.Children.Add(new UINode { Node = node, Controller = Controller, ParentPage = this });
             }
         }
 
@@ -115,12 +115,11 @@ namespace Mindmappy
             canvas.Tapped += OnTapped;
             mainGrid.SizeChanged += MainGrid_SizeChanged;
             DrawNodes();
+
             // TODO
             //addNodeButton.Click += AddNode;
             //removeEdgeButton.Click += RemoveEdge;
         }
-
-       
 
         private double offsetX;
         public double OffsetX
@@ -172,7 +171,7 @@ namespace Mindmappy
 
         public void UnfocusAll()
         {
-            Unfocus();
+            //Unfocus();
         }
 
         private void MainGrid_SizeChanged(object sender, SizeChangedEventArgs e)

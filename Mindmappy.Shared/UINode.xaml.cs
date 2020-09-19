@@ -12,20 +12,25 @@ using Microsoft.Msagl.Miscellaneous;
 using Microsoft.Msagl.Layout.Incremental;
 using Microsoft.Msagl.Layout.Initial;
 using MSAGLPoint = Microsoft.Msagl.Core.Geometry.Point;
-using MSAGLNode = Microsoft.Msagl.Core.Layout.Node;
 
 namespace Mindmappy.Shared
 {
     public sealed partial class UINode : Page, INotifyPropertyChanged
     {
         public string Label { get; set; }
-        public MSAGLNode Node { get; set; }
+        Node node;
+        public Node Node { 
+            get => node;
+            set {
+                node = value;
+                OnPropertyChanged("Node");
+            }
+        }
         public GraphViewer ParentPage { get; set; }
         public double Top { get => Node?.BoundingBox.Bottom ?? 0; }
         public double Left { get => Node?.BoundingBox.Left ?? 0; }
         public double NodeWidth { get => Node?.BoundingBox.Width ?? 100; }
         public double NodeHeight { get => Node?.BoundingBox.Height ?? 100; }
-
         private bool active;
         public bool Active
         {
@@ -47,7 +52,11 @@ namespace Mindmappy.Shared
 
         public UINode()
         {
-
+            InitializeComponent();
+            ManipulationDelta += UINode_ManipulationDelta;
+            resizePoint.ManipulationDelta += ResizePoint_ManipulationDelta;
+            Tapped += UINode_Tapped;
+            //ParentPage.Unfocus += Unfocus;
         }
 
         private void ResizePoint_ManipulationDelta(object sender, ManipulationDeltaRoutedEventArgs e)
@@ -78,8 +87,8 @@ namespace Mindmappy.Shared
             OnPropertyChanged("NodeHeight");
             var layout = new Relayout(
                 Controller.Graph,
-                new MSAGLNode[] { Node },
-                new MSAGLNode[] {},
+                new Node[] { Node },
+                new Node[] {},
                 (cluster) => Controller.LayoutSettings
             );
         }
@@ -105,14 +114,15 @@ namespace Mindmappy.Shared
             //{
             //    ParentPage.CanvasHeight += 500;
             //}
-            OnPropertyChanged("Left");
-            OnPropertyChanged("Top");
+
+            OnPropertyChanged("Node");
             var layout = new Relayout(
                 Controller.Graph,
-                new MSAGLNode[] { Node },
-                new MSAGLNode[] { },
+                new Node[] { Node },
+                new Node[] { },
                 (cluster) => Controller.LayoutSettings
             );
+            layout.Run();
         }
 
         private void Unfocus()
@@ -122,7 +132,7 @@ namespace Mindmappy.Shared
             textBox.IsReadOnly = true;
         }
 
-        private void OnTapped(object sender, TappedRoutedEventArgs e)
+        private void UINode_Tapped(object sender, TappedRoutedEventArgs e)
         {
             e.Handled = true;
             ParentPage.UnfocusAll();
