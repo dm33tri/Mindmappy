@@ -38,7 +38,6 @@ namespace CollabLib
             changed = new Dictionary<AbstractStruct, HashSet<string>>();
             mergeItems = new HashSet<ID>();
         }
-
         public void SetDeleted(Item item)
         {
 

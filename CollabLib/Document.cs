@@ -130,10 +130,8 @@ namespace CollabLib
 
                 Encoder encoder = new Encoder();
                 encoder.Encode(transaction);
-                if (Update != null)
-                {
-                    Update(this, encoder.Data);
-                }
+                var data = encoder.Data;
+
                 if (transactionCleanups.Count <= i + 1)
                 {
                     transactionCleanups.Clear();
@@ -141,6 +139,10 @@ namespace CollabLib
                 else
                 {
                     CleanupTransactions(i + 1);
+                }
+                if (data.Length > 0)
+                {
+                    Update?.Invoke(this, encoder.Data);
                 }
             }
         }

@@ -6,6 +6,8 @@ using CollabLib;
 using CollabLib.Struct;
 using CollabLib.Content;
 using Array = CollabLib.Struct.Array;
+using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace CollabLib.Tests
 {
@@ -133,6 +135,76 @@ namespace CollabLib.Tests
             text.InsertText(2, "CD");
 
             Assert.Equal("ABCDEF", ((doc2.GetArray("array")[0] as Map).Get("text") as Text).ToString());
+        }
+
+        [Fact]
+        public void AnyStruct()
+        {
+            Document doc0 = new Document();
+            Document doc1 = new Document();
+            Document doc2 = new Document();
+            Document doc3 = new Document();
+
+            doc0.clientId = 0;
+            doc1.clientId = 1;
+            doc2.clientId = 2;
+            doc3.clientId = 3;
+
+            doc0.Update += (doc, data) =>
+            {
+                doc1.ApplyUpdate(data);
+                doc2.ApplyUpdate(data);
+                doc3.ApplyUpdate(data);
+            };
+
+            doc1.Update += (doc, data) =>
+            {
+                doc0.ApplyUpdate(data);
+            };
+
+            doc2.Update += (doc, data) =>
+            {
+                doc0.ApplyUpdate(data);
+            };
+
+            doc3.Update += (doc, data) =>
+            {
+                doc0.ApplyUpdate(data);
+            };
+
+            var map0 = doc0.AddMap("map");
+            var map1 = doc1.AddMap("map");
+            var map2 = doc2.AddMap("map");
+            var map3 = doc3.AddMap("map");
+
+            var text0 = new Text();
+            map0.Set("text", text0);
+
+            var text1 = map1.Get("text") as Text;
+            var text2 = map2.Get("text") as Text;
+            var text3 = map3.Get("text") as Text;
+
+            //var tasks = new Task[] {
+            //    Task.Run(() => {
+            //        text0.InsertText(0, "text0");
+            //    }),
+            //    Task.Run(() => {
+            //        text1.InsertText(0, "text1"); 
+            //    }),
+            //    Task.Run(() => {
+            //        text2.InsertText(0, "text2"); 
+            //    }),
+            //    Task.Run(() => {
+            //        text3.InsertText(0, "text3"); 
+            //    }),
+            //};
+
+            //Task.WaitAll(tasks);
+            text0.InsertText(0, "text0");
+            text1.InsertText(0, "text1");
+            text2.InsertText(0, "text2");
+            text3.InsertText(0, "text3");
+            Debug.WriteLine(text3.ToString());
         }
     }
 }

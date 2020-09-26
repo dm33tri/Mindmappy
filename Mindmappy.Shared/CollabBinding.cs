@@ -48,7 +48,7 @@ namespace Mindmappy.Shared
         public async Task InitConnection()
         {
             var connection = new HubConnectionBuilder()
-                .WithUrl("http://localhost:44562/mindmappy")
+                .WithUrl("http://localhost:44322/mindmappy")
                 .WithAutomaticReconnect()
                 .Build();
 

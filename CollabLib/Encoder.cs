@@ -119,6 +119,11 @@ namespace CollabLib
                 }
             }
 
+            if (toState.Count == 0)
+            {
+                return 0;
+            }
+
             data.AddRange(BitConverter.GetBytes(toState.Count));
             count += 4;
 
