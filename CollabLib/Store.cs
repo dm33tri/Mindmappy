@@ -174,7 +174,7 @@ namespace CollabLib
                 }
                 while (itemRef.missing.Count > 0)
                 {
-                    ID missing = itemRef.missing.Last();
+                    ID missing = itemRef.missing.Count > 0 ? itemRef.missing.Last() : null;
                     if (GetState(missing.client) <= missing.clock)
                     {
                         PendingRefs pendingRefs;

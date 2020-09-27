@@ -12,10 +12,12 @@ namespace CollabLib
     {
         public byte[] data;
         public int index;
+        public Document doc;
 
-        public Decoder(byte[] data)
+        public Decoder(byte[] data, Document doc)
         {
             this.data = data;
+            this.doc = doc;
             index = 0;
         }
 

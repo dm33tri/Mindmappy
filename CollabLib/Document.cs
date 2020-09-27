@@ -171,7 +171,7 @@ namespace CollabLib
 
         public void ApplyUpdate(byte[] data)
         {
-            Decoder decoder = new Decoder(data);
+            Decoder decoder = new Decoder(data, this);
             Transact((transaction) =>
             {
                 decoder.ReadItems(transaction, store);

@@ -130,7 +130,7 @@ namespace CollabLib
             }
             else
             {
-                Item right = null;
+                Item right;
 
                 if (parentKey != null)
                 {

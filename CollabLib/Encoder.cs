@@ -97,6 +97,11 @@ namespace CollabLib
         // Encode all client states diff
         public int Encode(Store store, Dictionary<int, int> fromState)
         {
+            if (!store.StateVector.Any((pair) => !fromState.ContainsKey(pair.Key) || fromState[pair.Key] != pair.Value))
+            {
+                return 0;
+            }
+
             int count = 0;
             var toState = new Dictionary<int, int>();
 

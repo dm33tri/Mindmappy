@@ -31,15 +31,16 @@ namespace CollabLib
             parentDocKey = hasParentDocKey ? decoder.ReadString() : null;
             parent = canCopyParentInfo && !hasParentDocKey ? decoder.ReadID() : null;
             parentKey = canCopyParentInfo && (info & Encoder.Bit6) != 0 ? decoder.ReadString() : null;
-            if (left != null)
+            int lastClock = decoder.doc.store.GetState(id.client);
+            if (left != null && left.clock >= lastClock)
             {
                 missing.Add(left);
             }
-            if (right != null)
+            if (right != null && right.clock >= lastClock)
             {
                 missing.Add(right);
             }
-            if (parent != null)
+            if (parent != null && parent.clock >= lastClock)
             {
                 missing.Add(parent);
             }

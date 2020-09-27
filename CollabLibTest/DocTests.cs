@@ -184,27 +184,20 @@ namespace CollabLib.Tests
             var text2 = map2.Get("text") as Text;
             var text3 = map3.Get("text") as Text;
 
-            //var tasks = new Task[] {
-            //    Task.Run(() => {
-            //        text0.InsertText(0, "text0");
-            //    }),
-            //    Task.Run(() => {
-            //        text1.InsertText(0, "text1"); 
-            //    }),
-            //    Task.Run(() => {
-            //        text2.InsertText(0, "text2"); 
-            //    }),
-            //    Task.Run(() => {
-            //        text3.InsertText(0, "text3"); 
-            //    }),
-            //};
-
-            //Task.WaitAll(tasks);
             text0.InsertText(0, "text0");
             text1.InsertText(0, "text1");
             text2.InsertText(0, "text2");
             text3.InsertText(0, "text3");
-            Debug.WriteLine(text3.ToString());
+            text0.InsertText(5, "text4");
+            text1.InsertText(10, "text5");
+            text2.InsertText(15, "text6");
+            text3.InsertText(20, "text7");
+
+            Assert.True(
+                text0.ToString() == text1.ToString() &&
+                text1.ToString() == text2.ToString() &&
+                text2.ToString() == text3.ToString()
+            );
         }
     }
 }
