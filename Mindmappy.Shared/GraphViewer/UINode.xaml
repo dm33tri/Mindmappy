@@ -15,39 +15,47 @@
     Canvas.ZIndex="2">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="{Binding Path=NodeWidth}" />
+            <ColumnDefinition Width="{Binding Path=Node.BoundingBox.Width}" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <Rectangle x:Name="background" 
-            Grid.Column="0"
-            Width="{Binding Path=NodeWidth}"
-            Height="{Binding Path=NodeHeight}" 
-            Fill="Blue"
+            Width="{Binding Path=Node.BoundingBox.Width}"
+            Height="{Binding Path=Node.BoundingBox.Height}" 
+            Fill="White"
             Stroke="{Binding Path=Stroke}"
             StrokeThickness="3"
             IsHitTestVisible="False"
-            VerticalAlignment="Stretch" 
+            VerticalAlignment="Stretch"
             HorizontalAlignment="Stretch" />
         <TextBox
             x:Name="textBox"
-            Grid.Column="0"
-            Width="{Binding Path=NodeWidth}"
-            Height="{Binding Path=NodeHeight}"
+            Width="{Binding Path=Node.BoundingBox.Width}"
+            Height="{Binding Path=Node.BoundingBox.Height}"
             IsTabStop="False"
             VerticalAlignment="Stretch" 
             HorizontalAlignment="Stretch"
             AcceptsReturn="True"
             TextWrapping="Wrap"
             TextAlignment="Center"
-            Background="White"
+            Background="Transparent"
             BorderThickness="0"
-            Text="{Binding Path=Label, Mode=TwoWay}" />
+            Text="{Binding Path=Label, Mode=TwoWay}">
+            <TextBox.Resources>
+                <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="Transparent" />
+                <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="Transparent" />
+                <SolidColorBrush x:Key="TextControlBackgroundDisabled" Color="Transparent" />
+                <SolidColorBrush x:Key="TextControlForeground" Color="Black" />
+                <SolidColorBrush x:Key="TextControlForegroundFocused" Color="Black" />
+                <SolidColorBrush x:Key="TextControlForegroundDisabled" Color="Black" />
+                <SolidColorBrush x:Key="TextControlForegroundPointerOver" Color="Black" />
+                <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="Transparent" />
+            </TextBox.Resources>
+        </TextBox>
         <Rectangle 
             x:Name="overlay" 
-            Grid.Column="0"
-            Width="{Binding Path=NodeWidth}"
-            Height="{Binding Path=NodeHeight}" 
-            Fill="Red" 
+            Width="{Binding Path=Node.BoundingBox.Width}"
+            Height="{Binding Path=Node.BoundingBox.Height}" 
+            Fill="Transparent" 
             VerticalAlignment="Stretch" 
             HorizontalAlignment="Stretch" />
         <StackPanel Grid.Column="1">

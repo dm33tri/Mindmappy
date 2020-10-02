@@ -128,7 +128,7 @@ namespace Mindmappy.Shared
 
             if (!temp)
             {
-                ParentPage.Unfocus += ParentPage_Unfocus;
+                //ParentPage.Unfocus += ParentPage_Unfocus;
                 ParentPage.Canvas.Tapped += OnTapped;
             }
             ParentPage.Canvas.Children.Add(this);

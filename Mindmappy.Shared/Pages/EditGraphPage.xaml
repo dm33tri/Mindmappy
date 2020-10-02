@@ -1,5 +1,5 @@
 ﻿<Page
-    x:Class="Mindmappy.Shared.MainPage"
+    x:Class="Mindmappy.Shared.EditGraphPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Mindmappy.Shared"
@@ -11,8 +11,18 @@
 
     <Grid>
         <Frame x:Name="mainFrame" />
-
-        <NavigationView x:Name="menu" IsPaneOpen="False" PaneDisplayMode="LeftMinimal" IsBackButtonVisible="Collapsed" IsSettingsVisible="False">
+        <NavigationView 
+            x:Name="menu" 
+            IsPaneOpen="False" 
+            PaneDisplayMode="LeftMinimal" 
+            IsBackButtonVisible="Collapsed" 
+            IsSettingsVisible="False"
+        >
+            <NavigationView.PaneToggleButtonStyle>
+                <Style TargetType="Button" BasedOn="{StaticResource PaneToggleButtonStyle}">
+                    <Setter Property="Foreground" Value="Gray"/>
+                </Style>
+            </NavigationView.PaneToggleButtonStyle>
             <NavigationView.MenuItems>
                 <NavigationViewItem Content="Создать новый граф" x:Name="createNewGraph" />
                 <win:NavigationViewItem Content="Подключиться" x:Name="connect" />

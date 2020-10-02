@@ -14,8 +14,6 @@ using Mindmappy.Shared;
 
 namespace Mindmappy
 {
-    public delegate void UnfocusEventHandler();
-
     public sealed partial class GraphViewer : INotifyPropertyChanged
     {
         public CancelToken cancelToken = new CancelToken();
@@ -30,7 +28,6 @@ namespace Mindmappy
             }
         }
         public Visibility IsEdgeSelected { get => SelectedEdge != null ? Visibility.Visible : Visibility.Collapsed; }
-        public event UnfocusEventHandler Unfocus;
         private AddEdgeCursor cursor;
         public UIEdge CursorEdge { get; set; }
         public void AddCursorNode(UINode origin)
@@ -47,7 +44,7 @@ namespace Mindmappy
 
         private void OnResetFocus(object sender, RoutedEventArgs e)
         {
-            UnfocusAll();
+            Controller.UnfocusAll();
         }
 
         private void OnTapped(object sender, RoutedEventArgs e)
@@ -167,11 +164,6 @@ namespace Mindmappy
         {
             OffsetX += e.Delta.Translation.X;
             OffsetY += e.Delta.Translation.Y;
-        }
-
-        public void UnfocusAll()
-        {
-            //Unfocus();
         }
 
         private void MainGrid_SizeChanged(object sender, SizeChangedEventArgs e)

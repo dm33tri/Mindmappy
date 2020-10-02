@@ -42,5 +42,6 @@
                     Height="{Binding Path=CanvasHeight}" />
             </Grid>
         </ScrollViewer>
+        <local:BottomMenu Grid.Row="1" />
     </Grid>
 </Page>

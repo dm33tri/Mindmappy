@@ -7,6 +7,8 @@ using Microsoft.Msagl.Miscellaneous;
 
 namespace Mindmappy.Shared
 {
+    public delegate void UnfocusEventHandler();
+
     public class Controller
     {
         public GeometryGraph Graph { get; set; }
@@ -14,7 +16,11 @@ namespace Mindmappy.Shared
 
         public Edge SelectedEdge { get; set; } = null;
         public Node SelectedNode { get; set; } = null;
-
+        public event UnfocusEventHandler Unfocus;
+        public void UnfocusAll()
+        {
+            Unfocus();
+        }
         public Controller()
         {
             CreateGraph();

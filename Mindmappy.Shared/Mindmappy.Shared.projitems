@@ -15,59 +15,66 @@
     </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)AddEdgeCursor.xaml.cs">
+    <Compile Include="$(MSBuildThisFileDirectory)GraphViewer\AddEdgeCursor.xaml.cs">
       <DependentUpon>AddEdgeCursor.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)BottomMenu.xaml.cs">
+    <Compile Include="$(MSBuildThisFileDirectory)Menu\BottomMenu.xaml.cs">
       <DependentUpon>BottomMenu.xaml</DependentUpon>
     </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)Controller.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)CollabBinding.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)EdgesSurface.xaml.cs">
+    <Compile Include="$(MSBuildThisFileDirectory)State\Controller.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)State\CollabBinding.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GraphViewer\EdgesSurface.xaml.cs">
       <DependentUpon>EdgesSurface.xaml</DependentUpon>
     </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)GraphViewer.xaml.cs">
+    <Compile Include="$(MSBuildThisFileDirectory)Pages\EditGraphPage.xaml.cs">
+      <DependentUpon>EditGraphPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)GraphViewer\GraphViewer.xaml.cs">
       <DependentUpon>GraphViewer.xaml</DependentUpon>
     </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)MainPage.xaml.cs">
+    <Compile Include="$(MSBuildThisFileDirectory)Pages\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)UIEdge.xaml.cs">
+    <Compile Include="$(MSBuildThisFileDirectory)GraphViewer\UIEdge.xaml.cs">
       <DependentUpon>UIEdge.xaml</DependentUpon>
     </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)UINode.xaml.cs">
+    <Compile Include="$(MSBuildThisFileDirectory)GraphViewer\UINode.xaml.cs">
       <DependentUpon>UINode.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="$(MSBuildThisFileDirectory)AddEdgeCursor.xaml">
+    <Page Include="$(MSBuildThisFileDirectory)GraphViewer\AddEdgeCursor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="$(MSBuildThisFileDirectory)BottomMenu.xaml">
+    <Page Include="$(MSBuildThisFileDirectory)Menu\BottomMenu.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="$(MSBuildThisFileDirectory)EdgesSurface.xaml">
+    <Page Include="$(MSBuildThisFileDirectory)GraphViewer\EdgesSurface.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="$(MSBuildThisFileDirectory)GraphViewer.xaml">
+    <Page Include="$(MSBuildThisFileDirectory)Pages\EditGraphPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="$(MSBuildThisFileDirectory)MainPage.xaml">
+    <Page Include="$(MSBuildThisFileDirectory)GraphViewer\GraphViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="$(MSBuildThisFileDirectory)UIEdge.xaml">
+    <Page Include="$(MSBuildThisFileDirectory)Pages\MainPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="$(MSBuildThisFileDirectory)UINode.xaml">
+    <Page Include="$(MSBuildThisFileDirectory)GraphViewer\UIEdge.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)GraphViewer\UINode.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -77,5 +84,11 @@
   </ItemGroup>
   <ItemGroup>
     <PRIResource Include="$(MSBuildThisFileDirectory)Strings\en\Resources.resw" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)GraphViewer\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Pages\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Menu\" />
+    <Folder Include="$(MSBuildThisFileDirectory)State\" />
   </ItemGroup>
 </Project>

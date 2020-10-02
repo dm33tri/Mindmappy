@@ -48,7 +48,19 @@ namespace Mindmappy.Shared
 
         public Brush Stroke { get => active ? highlightBrush : defaultBrush; }
 
-        public Controller Controller { get; set; }
+        private Controller controller;
+        public Controller Controller { 
+            get => controller; 
+            set
+            {
+                if (controller != null)
+                {
+                    controller.Unfocus -= Unfocus;
+                }
+                controller = value;
+                controller.Unfocus += Unfocus;
+            }
+        }
 
         public UINode()
         {
@@ -56,7 +68,6 @@ namespace Mindmappy.Shared
             ManipulationDelta += UINode_ManipulationDelta;
             resizePoint.ManipulationDelta += ResizePoint_ManipulationDelta;
             Tapped += UINode_Tapped;
-            //ParentPage.Unfocus += Unfocus;
         }
 
         private void ResizePoint_ManipulationDelta(object sender, ManipulationDeltaRoutedEventArgs e)
@@ -83,46 +94,27 @@ namespace Mindmappy.Shared
             {
                 ParentPage.CanvasHeight += 500;
             }
-            OnPropertyChanged("NodeWidth");
-            OnPropertyChanged("NodeHeight");
-            var layout = new Relayout(
-                Controller.Graph,
-                new Node[] { Node },
-                new Node[] {},
-                (cluster) => Controller.LayoutSettings
-            );
+            OnPropertyChanged("Node");
+            Relayout();
         }
 
         private void UINode_ManipulationDelta(object sender, ManipulationDeltaRoutedEventArgs e)
         {
             e.Handled = true;
-            var delta = new MSAGLPoint(
-                e.Delta.Translation.X,
-#if __MACOS__ || __IOS__
-                -e.Delta.Translation.Y // on Mac delta is reversed
-#else
-                e.Delta.Translation.Y
-#endif
-            );
+            var delta = new MSAGLPoint(e.Delta.Translation.X, e.Delta.Translation.Y);
             Node.Center += delta;
 
-            //if (Node.BoundingBox.Right >= ParentPage.CanvasWidth - 20)
-            //{
-            //    ParentPage.CanvasWidth += 500;
-            //}
-            //if (Node.BoundingBox.Bottom >= ParentPage.CanvasHeight - 20)
-            //{
-            //    ParentPage.CanvasHeight += 500;
-            //}
+            if (Node.BoundingBox.Right >= ParentPage.CanvasWidth - 20)
+            {
+                ParentPage.CanvasWidth += 500;
+            }
+            if (Node.BoundingBox.Bottom >= ParentPage.CanvasHeight - 20)
+            {
+                ParentPage.CanvasHeight += 500;
+            }
 
             OnPropertyChanged("Node");
-            var layout = new Relayout(
-                Controller.Graph,
-                new Node[] { Node },
-                new Node[] { },
-                (cluster) => Controller.LayoutSettings
-            );
-            layout.Run();
+            Relayout();
         }
 
         private void Unfocus()
@@ -135,7 +127,7 @@ namespace Mindmappy.Shared
         private void UINode_Tapped(object sender, TappedRoutedEventArgs e)
         {
             e.Handled = true;
-            ParentPage.UnfocusAll();
+            Controller.UnfocusAll();
             if (ParentPage.CursorEdge != null)
             {
                 ParentPage.AttachEdge(this);
@@ -144,6 +136,17 @@ namespace Mindmappy.Shared
             {
                 Focus();
             }
+        }
+
+        public void Relayout()
+        {
+            var layout = new Relayout(
+                Controller.Graph,
+                new Node[] { Node },
+                new Node[] { },
+                (cluster) => Controller.LayoutSettings
+            );
+            layout.Run();
         }
 
         public void OnRemoveClick(object sender, RoutedEventArgs e)
