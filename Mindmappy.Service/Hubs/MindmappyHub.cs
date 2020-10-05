@@ -5,15 +5,15 @@ namespace Mindmappy.Service.Hubs
 {
     public class MindmappyHub : Hub
     {
-        int lastClientId = 0;
-        public async Task OnConnected()
-        {
-            await Clients.Client(Context.ConnectionId).SendAsync("Connected", lastClientId);
-        }
+        //int lastClientId = 0;
+        //public async Task OnConnected()
+        //{
+        //    await Clients.Client(Context.ConnectionId).SendAsync("Connected", lastClientId);
+        //}
 
-        public async Task SendMessage(int user, byte[] message)
+        public async Task ReceiveMessage(byte[] message)
         {
-            await Clients.All.SendAsync("ReceiveMessage", user, message);
+            await Clients.All.SendAsync("ReceiveMessage", message);
         }
     }
 }

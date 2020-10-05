@@ -18,6 +18,12 @@ namespace Mindmappy.Shared
             StrokeWidth = 3
         };
 
+        SKPaint arrowPaint = new SKPaint
+        {
+            Color = SKColors.Black,
+            Style = SKPaintStyle.Fill
+        };
+
         public EdgesSurface()
         {
             InitializeComponent();
@@ -27,6 +33,26 @@ namespace Mindmappy.Shared
         SKPoint P(Point p)
         {
             return new SKPoint((float)p.X, (float)p.Y);
+        }
+
+        void DrawArrowhead(SKCanvas canvas, Point from, Point to)
+        {
+            Point dir = to - from;
+            Point h = new Point(-dir.Y, dir.X);
+            h /= h.Length;
+            Point p1 = from + h * 5;
+            Point p2 = from - h * 5;
+
+            using (SKPath path = new SKPath { FillType = SKPathFillType.EvenOdd })
+            {
+
+                path.MoveTo(P(to));
+                path.LineTo(P(p1));
+                path.LineTo(P(p2));
+                path.LineTo(P(to));
+                path.Close();
+                canvas.DrawPath(path, arrowPaint);
+            }
         }
 
         void PaintEdges(SKCanvas canvas)
@@ -64,7 +90,16 @@ namespace Mindmappy.Shared
                     var s = curve as LineSegment;
                     canvas.DrawLine(P(s[0]), P(s[1]), linePaint);
                 }
+                if (edge.ArrowheadAtSource)
+                {
+                    DrawArrowhead(canvas, edge.Curve.Start, edge.EdgeGeometry.SourceArrowhead.TipPosition);
+                }
+                if (edge.ArrowheadAtTarget)
+                {
+                    DrawArrowhead(canvas, edge.Curve.End, edge.EdgeGeometry.TargetArrowhead.TipPosition);
+                }
             }
+
         }
 
         void PaintSurface(object sender, SKPaintSurfaceEventArgs e)

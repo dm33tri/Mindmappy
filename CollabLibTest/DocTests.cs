@@ -199,5 +199,74 @@ namespace CollabLib.Tests
                 text2.ToString() == text3.ToString()
             );
         }
+
+        [Fact]
+        public void SyncNodes()
+        {
+            Document doc0 = new Document();
+            Document doc1 = new Document();
+            Document doc2 = new Document();
+            Document doc3 = new Document();
+
+            Func<Document, Map> AddNode = (Document doc) =>
+            {
+                var nodes = doc.GetArray("nodes");
+                var map = new Map();
+                nodes.Push(map);
+                map.Set("x", new ContentBinary(BitConverter.GetBytes(0)));
+                map.Set("y", new ContentBinary(BitConverter.GetBytes(0)));
+                map.Set("text", new Text());
+                
+                return map;
+            };
+
+            doc0.AddArray("nodes");
+            doc1.AddArray("nodes");
+            doc2.AddArray("nodes");
+            doc3.AddArray("nodes");
+
+            doc0.Update += (doc, data) =>
+            {
+                doc1.ApplyUpdate(data);
+                doc2.ApplyUpdate(data);
+                doc3.ApplyUpdate(data);
+            };
+
+            doc1.Update += (doc, data) =>
+            {
+                doc0.ApplyUpdate(data);
+            };
+
+            doc2.Update += (doc, data) =>
+            {
+                doc0.ApplyUpdate(data);
+            };
+
+            doc3.Update += (doc, data) =>
+            {
+                doc0.ApplyUpdate(data);
+            };
+
+            var node0 = AddNode(doc0);
+            var node1 = AddNode(doc0);
+            var node2 = AddNode(doc0);
+
+            var nodes2 = doc3.GetArray("nodes");
+            Map node2_2 = nodes2[nodes2.length - 1] as Map;
+            node2_2.Update += (sender, changedKeys) =>
+            {
+                foreach (var key in changedKeys)
+                {
+                    Debug.WriteLine(node2_2.Get(key).ToString());
+                }
+            };
+
+            var nodes3 = doc3.GetArray("nodes");
+            Map node2_3 = nodes3[nodes3.length - 1] as Map;
+            Text node_2_3_Text = node2_3.Get("text") as Text;
+            node_2_3_Text.InsertText(0, "node2");
+
+            Assert.Equal("node2", (node2_2.Get("text") as Text).ToString());
+        }
     }
 }

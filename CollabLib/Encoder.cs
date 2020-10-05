@@ -161,7 +161,6 @@ namespace CollabLib
             return count;
         }
 
-
         // Encode latest transaction
         public int Encode(Transaction transaction)
         {

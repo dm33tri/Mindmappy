@@ -45,7 +45,7 @@ namespace Mindmappy
 			{
 				if (rootFrame.Content == null)
 				{
-					rootFrame.Navigate(typeof(EditGraphPage), e.Arguments);
+					rootFrame.Navigate(typeof(GraphViewer), e.Arguments);
 				}
 				Windows.UI.Xaml.Window.Current.Activate();
 			}

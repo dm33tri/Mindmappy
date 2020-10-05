@@ -11,11 +11,20 @@ using Microsoft.Msagl.Miscellaneous;
 using MSAGLNode = Microsoft.Msagl.Core.Layout.Node;
 using MSAGLPoint = Microsoft.Msagl.Core.Geometry.Point;
 using Mindmappy.Shared;
+using System.Threading.Tasks;
 
 namespace Mindmappy
 {
     public sealed partial class GraphViewer : INotifyPropertyChanged
     {
+        string imagePath;
+        public string ImagePath { 
+            get => imagePath;
+            set {
+                imagePath = value;
+                OnPropertyChanged("ImagePath");
+            }
+        }
         public CancelToken cancelToken = new CancelToken();
         private UIEdge selectedEdge;
         public UIEdge SelectedEdge
@@ -112,10 +121,16 @@ namespace Mindmappy
             canvas.Tapped += OnTapped;
             mainGrid.SizeChanged += MainGrid_SizeChanged;
             DrawNodes();
-
+            GetImagePath();
             // TODO
             //addNodeButton.Click += AddNode;
             //removeEdgeButton.Click += RemoveEdge;
+        }
+
+        async Task GetImagePath()
+        {
+            await Controller.WriteGraph();
+            ImagePath = Controller.ImagePath;
         }
 
         private double offsetX;

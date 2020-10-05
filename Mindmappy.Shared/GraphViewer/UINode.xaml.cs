@@ -6,10 +6,8 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI;
-using Microsoft.Msagl.Core;
 using Microsoft.Msagl.Core.Layout;
 using Microsoft.Msagl.Miscellaneous;
-using Microsoft.Msagl.Layout.Incremental;
 using Microsoft.Msagl.Layout.Initial;
 using MSAGLPoint = Microsoft.Msagl.Core.Geometry.Point;
 

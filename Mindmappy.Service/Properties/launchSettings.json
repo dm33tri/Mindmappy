@@ -4,7 +4,7 @@
     "anonymousAuthentication": true,
     "iisExpress": {
       "applicationUrl": "http://localhost:6608",
-      "sslPort": 44322
+      "sslPort": 0
     }
   },
   "profiles": {
@@ -18,10 +18,10 @@
     "Mindmappy.Service": {
       "commandName": "Project",
       "launchBrowser": true,
-      "applicationUrl": "https://localhost:44562;http://localhost:16589",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "applicationUrl": "https://localhost:44562;http://localhost:16589"
     }
   }
 }
