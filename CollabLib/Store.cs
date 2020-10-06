@@ -16,7 +16,6 @@ namespace CollabLib
         public Dictionary<int, List<Item>> clientStates = new Dictionary<int, List<Item>>();
         public Dictionary<int, PendingRefs> pendingClientRefs = new Dictionary<int, PendingRefs>();
         public List<ItemRef> pendingStack = new List<ItemRef>();
-
         public Dictionary<int, int> StateVector { 
             get {
                 var vector = new Dictionary<int, int>();

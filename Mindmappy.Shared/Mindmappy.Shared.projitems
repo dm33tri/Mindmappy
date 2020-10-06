@@ -29,14 +29,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)GraphViewer\EdgesSurface.xaml.cs">
       <DependentUpon>EdgesSurface.xaml</DependentUpon>
     </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)Pages\EditGraphPage.xaml.cs">
-      <DependentUpon>EditGraphPage.xaml</DependentUpon>
-    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)GraphViewer\GraphViewer.xaml.cs">
       <DependentUpon>GraphViewer.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)Pages\MainPage.xaml.cs">
-      <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)GraphViewer\UIEdge.xaml.cs">
       <DependentUpon>UIEdge.xaml</DependentUpon>
@@ -58,15 +52,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="$(MSBuildThisFileDirectory)Pages\EditGraphPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="$(MSBuildThisFileDirectory)GraphViewer\GraphViewer.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)Pages\MainPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -87,7 +73,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)GraphViewer\" />
-    <Folder Include="$(MSBuildThisFileDirectory)Pages\" />
     <Folder Include="$(MSBuildThisFileDirectory)Menu\" />
     <Folder Include="$(MSBuildThisFileDirectory)State\" />
   </ItemGroup>

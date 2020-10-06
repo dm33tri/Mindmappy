@@ -32,6 +32,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mindmappy.macOS", "Mindmappy.macOS\Mindmappy.macOS.csproj", "{0AF1F9FE-8659-41EE-88A1-2D47986F3C2B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mindmappy.Service", "Mindmappy.Service\Mindmappy.Service.csproj", "{380275CD-74D4-4721-8E1C-23B61033885B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5A68CCAE-FE84-416F-9CB3-DA9767A0666F} = {5A68CCAE-FE84-416F-9CB3-DA9767A0666F}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution

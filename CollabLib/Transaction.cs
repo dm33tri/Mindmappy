@@ -46,7 +46,7 @@ namespace CollabLib
         public void SetChanged(AbstractStruct changedStruct, string parentKey) 
         {
             Item item = changedStruct.item;
-            if (item == null || (item.id.clock < beforeState[item.id.client] && !item.deleted))
+            if (item == null || (beforeState.ContainsKey(item.id.client) && item.id.clock < beforeState[item.id.client] && !item.deleted))
             {
                 if (!changed.ContainsKey(changedStruct))
                 {

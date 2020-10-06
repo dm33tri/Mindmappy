@@ -57,8 +57,11 @@ namespace Mindmappy.Shared
 
         void PaintEdges(SKCanvas canvas)
         {
-            var graph = Controller.Graph;
-
+            var graph = Controller?.GeometryGraph;
+            if (graph == null)
+            {
+                return;
+            }
             foreach (Edge edge in graph.Edges)
             {
                 var curve = edge.Curve;
@@ -99,7 +102,6 @@ namespace Mindmappy.Shared
                     DrawArrowhead(canvas, edge.Curve.End, edge.EdgeGeometry.TargetArrowhead.TipPosition);
                 }
             }
-
         }
 
         void PaintSurface(object sender, SKPaintSurfaceEventArgs e)

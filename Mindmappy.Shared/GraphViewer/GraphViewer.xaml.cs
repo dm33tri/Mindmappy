@@ -41,7 +41,7 @@ namespace Mindmappy
         public UIEdge CursorEdge { get; set; }
         public void AddCursorNode(UINode origin)
         {
-            var graph = Controller.Graph;
+            var graph = Controller.GeometryGraph;
             var tempNode = new MSAGLNode(CurveFactory.CreateRectangle(1, 1, new MSAGLPoint(0, 0)));
             var tempEdge = new Edge(origin.Node, tempNode);
             graph.Nodes.Add(tempNode);
@@ -66,7 +66,7 @@ namespace Mindmappy
 
         public void AttachEdge(UINode node)
         {
-            var graph = Controller.Graph;
+            var graph = Controller.GeometryGraph;
             var origin = CursorEdge.Edge.Source;
 
             canvas.PointerMoved -= cursor.OnPointerMoved;
@@ -85,43 +85,30 @@ namespace Mindmappy
         }
 
         public Canvas Canvas { get => canvas; }
-        public Controller Controller { get; set; } = new Controller();
+
+
+        public Controller Controller { get; set; }
         public InitialLayout layout;
         public FastIncrementalLayoutSettings layoutSettings;
 
         public void DrawNodes()
         {
-            foreach (var node in Controller.Graph.Nodes)
+            foreach (var node in Controller.GeometryGraph.Nodes)
             {
-                canvas.Children.Add(new UINode { Node = node, Controller = Controller, ParentPage = this });
+                var uiNode = new UINode { Node = node, Controller = Controller, ParentPage = this };
+                Controller.UINodes.Add(uiNode);
+                canvas.Children.Add(uiNode);
             }
         }
 
         public GraphViewer()
         {
-            var graph = Controller.Graph;
-            layoutSettings = new FastIncrementalLayoutSettings
-            {
-                NodeSeparation = 64,
-                AvoidOverlaps = true,
-                MinConstraintLevel = 1,
-            };
-            layout = new InitialLayout(graph, layoutSettings);
-            layout.SingleComponent = true;
-            layout.Run();
-            LayoutHelpers.RouteAndLabelEdges(graph, layoutSettings, graph.Edges);
-
             InitializeComponent();
+            Controller = new Controller(this);
             edgesSurface.Controller = Controller;
-#if __ANDROID__ || __WASM__
-            canvas.PointerPressed += OnResetFocus;
-#else
             canvas.Tapped += OnResetFocus;
-#endif
             canvas.Tapped += OnTapped;
             mainGrid.SizeChanged += MainGrid_SizeChanged;
-            DrawNodes();
-            GetImagePath();
             // TODO
             //addNodeButton.Click += AddNode;
             //removeEdgeButton.Click += RemoveEdge;

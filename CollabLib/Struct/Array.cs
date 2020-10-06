@@ -44,7 +44,6 @@ namespace CollabLib.Struct
 
             Item right = left?.right ?? start;
 
-
             Item newItem = new Item(
                 transaction.NextID(),
                 left,

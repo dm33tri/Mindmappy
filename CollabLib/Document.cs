@@ -171,6 +171,10 @@ namespace CollabLib
 
         public void ApplyUpdate(byte[] data)
         {
+            if (data.Length == 0)
+            {
+                return;
+            }
             Decoder decoder = new Decoder(data, this);
             Transact((transaction) =>
             {

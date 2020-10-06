@@ -83,6 +83,23 @@ namespace CollabLib.Struct
             }
         }
 
+        public void Diff(string newText)
+        {
+            var curr = ToString();
+            int start = curr.Length;
+            for (int i = 0; i < curr.Length; ++i)
+            {
+                if (newText[i] != curr[i])
+                {
+                    start = i;
+                    break;
+                }
+            }
+            var len = newText.Length - curr.Length;
+            var diff = newText.Substring(start, len);
+            InsertText(start, diff);
+        }
+
         public void Delete(int index, int length)
         {
 

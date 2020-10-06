@@ -17,31 +17,23 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <ScrollViewer
-            x:Name="scrollViewer"
-            Grid.Row="0"
-            VerticalScrollMode="Enabled"
-            HorizontalScrollMode="Enabled"
-            VerticalScrollBarVisibility="Visible"
-            HorizontalScrollBarVisibility="Visible">
-            <Grid 
-                x:Name="canvasGrid" 
+        <Grid 
+            x:Name="canvasGrid" 
+            Width="{Binding Path=CanvasWidth}"
+            Height="{Binding Path=CanvasHeight}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <local:EdgesSurface x:Name="edgesSurface" />
+            <Canvas 
+                x:Name="canvas"
+                Background="Transparent" 
                 Width="{Binding Path=CanvasWidth}"
-                Height="{Binding Path=CanvasHeight}">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <local:EdgesSurface x:Name="edgesSurface" />
-                <Canvas 
-                    x:Name="canvas"
-                    Background="Transparent" 
-                    Width="{Binding Path=CanvasWidth}"
-                    Height="{Binding Path=CanvasHeight}" />
-            </Grid>
-        </ScrollViewer>
+                Height="{Binding Path=CanvasHeight}" />
+        </Grid>
         <local:BottomMenu Grid.Row="1" />
     </Grid>
 </Page>
