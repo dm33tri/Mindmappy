@@ -160,8 +160,8 @@ namespace Mindmappy.Shared
         {
             var node = Controller.AddNode();
             var text = map.Get("text") as Text;
-            var x = BitConverter.ToDouble((map.Get("x") as ContentBinary).data);
-            var y = BitConverter.ToDouble((map.Get("y") as ContentBinary).data);
+            var x = map.Get("x") is ContentBinary ? BitConverter.ToDouble((map.Get("x") as ContentBinary).data) : 0;
+            var y = map.Get("y") is ContentBinary ? BitConverter.ToDouble((map.Get("y") as ContentBinary).data) : 0;
             node.Label = text?.ToString() ?? "";
             node.Left = x;
             node.Top = y;

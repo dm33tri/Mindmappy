@@ -2,13 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>d8209e22-dd61-421a-b612-c13445f6f686</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
     <Folder Include="Hubs\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\CollabLib\CollabLib.csproj" />
   </ItemGroup>
 </Project>

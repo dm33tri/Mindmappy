@@ -107,7 +107,10 @@ namespace Mindmappy.Shared
         void PaintSurface(object sender, SKPaintSurfaceEventArgs e)
         {
             var canvas = e.Surface.Canvas;
-            canvas.Scale(2);
+            if (e.Info.Width != this.ActualWidth && this.ActualWidth > 0)
+            {
+                canvas.Scale((float)(e.Info.Width / this.ActualWidth));
+            }
             canvas.Clear(SKColors.White);
             PaintEdges(canvas);
         }
