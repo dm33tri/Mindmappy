@@ -42,19 +42,15 @@ namespace Mindmappy.Shared
             InitConnection();
         }
 
+        HubConnection connection;
         public async Task InitConnection()
         {
-            var connection = new HubConnectionBuilder()
+            connection = new HubConnectionBuilder()
                 .WithUrl("https://mindmappyservice20201007154114.azurewebsites.net/mindmappy")
                 .WithAutomaticReconnect()
                 .Build();
 
-            connection.On("First", () => AddNodes());
-
-            connection.On<string>("NewUser", (id) => {      
-                connection.SendAsync("NewUser", id, document.EncodeState());
-            });
-
+            connection.On("Reset", () => Controller.Reset());
             connection.On<byte[]>("Update", (message) => {
                 document.ApplyUpdate(message);
             });
@@ -86,7 +82,7 @@ namespace Mindmappy.Shared
             }
         }
 
-        public void Nodes_Update(object sender, string[] changedKeys)
+        private void Nodes_Update(object sender, string[] changedKeys)
         {
             while (nodes.length > Controller.UINodes.Count)
             {
@@ -96,6 +92,10 @@ namespace Mindmappy.Shared
             }
         }
 
+        public void Reset()
+        {
+            connection.SendAsync("Reset");
+        }
         public void SetNodeUpdateHandler(UINode node, Map map)
         {
             Text text = map.Get("text") as Text;
@@ -127,20 +127,18 @@ namespace Mindmappy.Shared
                         case "x":
                             double x = BitConverter.ToDouble((map.Get("x") as ContentBinary).data);
                             double diffX = x - node.Left;
-                            if (diffX != 0)
+                            if (x != node.Left)
                             {
-                                node.Node.Center += new MSAGLPoint(diffX, 0);
-                                node.OnPropertyChanged("Node");
+                                node.Left = x;
                                 node.Relayout();
                             }
                             break;
                         case "y":
                             double y = BitConverter.ToDouble((map.Get("y") as ContentBinary).data);
                             double diffY = y - node.Top;
-                            if (diffY != 0)
+                            if (y != node.Top)
                             {
-                                node.Node.Center += new MSAGLPoint(0, diffY);
-                                node.OnPropertyChanged("Node");
+                                node.Top = y;
                                 node.Relayout();
                             }
                             break;
@@ -171,11 +169,14 @@ namespace Mindmappy.Shared
         public void AddNode(UINode node)
         {
             var map = new Map();
-            nodes.Push(map);
-            map.Set("x", new ContentBinary(BitConverter.GetBytes(node.Left)));
-            map.Set("y", new ContentBinary(BitConverter.GetBytes(node.Top)));
-            var text = new Text();
-            map.Set("text", text);
+            document.Transact((transaction) =>
+            {
+                nodes.InsertFunc(nodes.length, map, transaction);
+                map.SetFunc("x", new ContentBinary(BitConverter.GetBytes(node.Left)), transaction);
+                map.SetFunc("y", new ContentBinary(BitConverter.GetBytes(node.Top)), transaction);
+                var text = new Text();
+                map.SetFunc("text", text, transaction);
+            });
             SetNodeUpdateHandler(node, map);
         }
 
@@ -183,28 +184,21 @@ namespace Mindmappy.Shared
         {
             var from = (map.Get("from") as ContentString).str;
             var to = (map.Get("to") as ContentString).str;
-            Controller.AddEdge(from, to);
+            if (from != null && to != null)
+            {
+                Controller.AddEdge(from, to);
+            }
         }
 
         public void AddEdge(Edge edge)
         {
             var map = new Map();
-            edges.Push(map);
-            map.Set("from", new ContentString(edge.Source));
-            map.Set("to", new ContentString(edge.Target));
-        }
-
-        public void AddNodes()
-        {
-            Controller.CreateNodes();
-            foreach (var node in Controller.UINodes)
+            document.Transact((transaction) =>
             {
-                AddNode(node);
-            }
-            foreach (var edge in Controller.Graph.Edges)
-            {
-                AddEdge(edge);
-            }
+                edges.InsertFunc(edges.length, map, transaction);
+                map.SetFunc("from", new ContentString(edge.Source), transaction);
+                map.SetFunc("to", new ContentString(edge.Target), transaction);
+            });
         }
     }
 }

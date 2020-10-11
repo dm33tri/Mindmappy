@@ -37,19 +37,6 @@ namespace Mindmappy
             }
         }
         public Visibility IsEdgeSelected { get => SelectedEdge != null ? Visibility.Visible : Visibility.Collapsed; }
-        private AddEdgeCursor cursor;
-        public UIEdge CursorEdge { get; set; }
-        public void AddCursorNode(UINode origin)
-        {
-            var graph = Controller.GeometryGraph;
-            var tempNode = new MSAGLNode(CurveFactory.CreateRectangle(1, 1, new MSAGLPoint(0, 0)));
-            var tempEdge = new Edge(origin.Node, tempNode);
-            graph.Nodes.Add(tempNode);
-            graph.Edges.Add(tempEdge);
-            CursorEdge = new UIEdge(tempEdge, this, graph, true);
-            cursor = new AddEdgeCursor(tempNode, this, graph, layoutSettings);
-            canvas.PointerMoved += cursor.OnPointerMoved;
-        }
 
         private void OnResetFocus(object sender, RoutedEventArgs e)
         {
@@ -58,29 +45,9 @@ namespace Mindmappy
 
         private void OnTapped(object sender, RoutedEventArgs e)
         {
-            if (cursor != null)
+            if (Controller.EdgeFromNode != null)
             {
-                AttachEdge(null);
-            }
-        }
-
-        public void AttachEdge(UINode node)
-        {
-            var graph = Controller.GeometryGraph;
-            var origin = CursorEdge.Edge.Source;
-
-            canvas.PointerMoved -= cursor.OnPointerMoved;
-            CursorEdge.Remove();
-            graph.Nodes.Remove(cursor.Node);
-            CursorEdge = null;
-            cursor = null;
-
-            if (node != null && origin != node.Node)
-            {
-                var newEdge = new Edge(origin, node.Node);
-                graph.Edges.Add(newEdge);
-                new UIEdge(newEdge, this, graph);
-                LayoutHelpers.RouteAndLabelEdges(graph, layoutSettings, new[] { newEdge });
+                Controller.EdgeFromNode = null;
             }
         }
 
@@ -90,16 +57,6 @@ namespace Mindmappy
         public Controller Controller { get; set; }
         public InitialLayout layout;
         public FastIncrementalLayoutSettings layoutSettings;
-
-        public void DrawNodes()
-        {
-            foreach (var node in Controller.GeometryGraph.Nodes)
-            {
-                var uiNode = new UINode { Node = node, Controller = Controller, ParentPage = this };
-                Controller.UINodes.Add(uiNode);
-                canvas.Children.Add(uiNode);
-            }
-        }
 
         public GraphViewer()
         {

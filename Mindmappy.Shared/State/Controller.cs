@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System;
 using Microsoft.Msagl.Drawing;
 using System.Collections.Generic;
+
 using SvgGraphWriter = Microsoft.Msagl.Drawing.SvgGraphWriter;
 using Graph = Microsoft.Msagl.Drawing.Graph;
 using Node = Microsoft.Msagl.Drawing.Node;
@@ -27,6 +28,7 @@ namespace Mindmappy.Shared
         public LayoutAlgorithmSettings LayoutSettings { get => Graph.LayoutAlgorithmSettings; }
         public List<UINode> UINodes { get; } = new List<UINode>();
         public List<UIEdge> UIEdges { get; } = new List<UIEdge>();
+        public UINode EdgeFromNode { get; set; }
         public Edge SelectedEdge { get; set; }
         public Node SelectedNode { get; set; }
         public CollabBinding CollabBinding { get; set; }
@@ -37,17 +39,13 @@ namespace Mindmappy.Shared
 
         public async Task WriteGraph()
         {
-            Windows.Storage.StorageFolder storageFolder =
-            Windows.Storage.ApplicationData.Current.LocalFolder;
-            Windows.Storage.StorageFile sampleFile = await storageFolder.CreateFileAsync("sample.svg",
-                    Windows.Storage.CreationCollisionOption.ReplaceExisting);
-            var stream = await sampleFile.OpenAsync(Windows.Storage.FileAccessMode.ReadWrite);
+            Windows.Storage.StorageFile file = await Windows.Storage.DownloadsFolder.CreateFileAsync("mindmap.svg", Windows.Storage.CreationCollisionOption.GenerateUniqueName);
+            var stream = await file.OpenAsync(Windows.Storage.FileAccessMode.ReadWrite);
             using (var outputStream = stream.GetOutputStreamAt(0).AsStreamForWrite())
             {
                 SvgGraphWriter writer = new SvgGraphWriter(outputStream, Graph);
                 writer.Write();
             }
-            ImagePath = sampleFile.Path;
             stream.Dispose();
         }
 
@@ -61,21 +59,33 @@ namespace Mindmappy.Shared
         public UINode AddNode()
         {
             Node node = Graph.AddNode(Graph.NodeCount.ToString());
+            node.LabelText = "";
             GeomNode geomNode = GeometryGraphCreator.CreateGeometryNode(Graph, GeometryGraph, node, ConnectionToGraph.Connected);
             geomNode.BoundaryCurve = NodeBoundaryCurves.GetNodeBoundaryCurve(node, 150, 60);
-            var uiNode = new UINode { Node = geomNode, Controller = this, ParentPage = GraphViewer };
+            geomNode.Center = new Microsoft.Msagl.Core.Geometry.Point(100, 100);
+            UINode uiNode = new UINode { Node = node, Controller = this, ParentPage = GraphViewer };
             UINodes.Add(uiNode);
             GraphViewer.Canvas.Children.Add(uiNode);
-
             return uiNode;
         }
 
-        public void AddEdge(string from, string to)
+        public Edge AddEdge(string from, string to)
         {
             Edge edge = Graph.AddEdge(from, to);
             GeomEdge geomEdge = GeometryGraphCreator.CreateGeometryEdgeFromDrawingEdge(edge);
             GeometryGraph.Edges.Add(geomEdge);
             LayoutHelpers.RouteAndLabelEdges(GeometryGraph, LayoutSettings, GeometryGraph.Edges);
+            return edge;
+        }
+
+        public void CreateNode()
+        {
+            CollabBinding.AddNode(AddNode());
+        }
+
+        public void CreateEdge(string from, string to)
+        {
+            CollabBinding.AddEdge(AddEdge(from, to));
         }
 
         private void CreateCollabBinding()
@@ -83,23 +93,9 @@ namespace Mindmappy.Shared
             this.CollabBinding = new CollabBinding(this);
         }
 
-        public void CreateNodes()
+        public void Reset()
         {
-            for (int i = 0; i < 5; i++)
-            {
-                AddNode();
-                for (int j = 0; j < i; ++j)
-                {
-                    AddEdge(j.ToString(), i.ToString());
-                }
-            }
 
-            new InitialLayout(GeometryGraph, LayoutSettings as FastIncrementalLayoutSettings).Run();
-            foreach (UINode node in UINodes)
-            {
-                node.OnPropertyChanged("Node");
-            }
-            LayoutHelpers.RouteAndLabelEdges(GeometryGraph, LayoutSettings, GeometryGraph.Edges);
         }
 
         private void CreateGraph()

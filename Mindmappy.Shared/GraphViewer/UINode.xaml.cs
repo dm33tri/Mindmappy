@@ -7,6 +7,8 @@ using Windows.UI;
 using Microsoft.Msagl.Core.Layout;
 using Microsoft.Msagl.Layout.Initial;
 using MSAGLPoint = Microsoft.Msagl.Core.Geometry.Point;
+using MSAGLNode = Microsoft.Msagl.Core.Layout.Node;
+using Node = Microsoft.Msagl.Drawing.Node;
 
 namespace Mindmappy.Shared
 {
@@ -22,8 +24,13 @@ namespace Mindmappy.Shared
             set
             {
                 node = value;
-                OnPropertyChanged("Node");
+                OnPropertyChanged("GeometryNode");
             }
+        }
+
+        public MSAGLNode GeometryNode
+        {
+            get => node?.GeometryNode;
         }
 
         Controller controller;
@@ -41,12 +48,11 @@ namespace Mindmappy.Shared
             }
         }
 
-        string label;
         public string Label {
-            get => label;
+            get => node?.LabelText;
             set
             {
-                label = value;
+                node.LabelText = value;
                 OnPropertyChanged("Label");
             }
         }
@@ -62,7 +68,7 @@ namespace Mindmappy.Shared
                 OnPropertyChanged("Stroke");
             }
         }
-
+        public Brush Stroke { get => active ? highlightBrush : defaultBrush; }
         public GraphViewer ParentPage { get; set; }
         public double Top { 
             get => Node?.BoundingBox.Bottom ?? 0; 
@@ -71,8 +77,8 @@ namespace Mindmappy.Shared
                 if (Node != null)
                 {
                     MSAGLPoint diff = new MSAGLPoint(0, value - Node.BoundingBox.Bottom);
-                    Node.Center += diff;
-                    OnPropertyChanged("Node");
+                    GeometryNode.Center += diff;
+                    OnPropertyChanged("GeometryNode");
                 }
             }
         }
@@ -84,14 +90,13 @@ namespace Mindmappy.Shared
                 if (Node != null)
                 {
                     MSAGLPoint diff = new MSAGLPoint(value - Node.BoundingBox.Left, 0);
-                    Node.Center += diff;
-                    OnPropertyChanged("Node");
+                    GeometryNode.Center += diff;
+                    OnPropertyChanged("GeometryNode");
                 }
             }
         }
         public double NodeWidth { get => Node?.BoundingBox.Width ?? 0; }
         public double NodeHeight { get => Node?.BoundingBox.Height ?? 0; }
-        public Brush Stroke { get => active ? highlightBrush : defaultBrush; }
 
         public UINode()
         {
@@ -101,6 +106,7 @@ namespace Mindmappy.Shared
             resizePoint.ManipulationDelta += ResizePoint_ManipulationDelta;
             textBox.TextChanging += TextBox_TextChanging;
             removeButton.Click += RemoveButton_Click;
+            addEdgeButton.Tapped += AddEdgeButton_Tapped;
         }
 
         void TextBox_TextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
@@ -121,8 +127,8 @@ namespace Mindmappy.Shared
             {
                 box.Top += delta.Y;
             }
-            Node.BoundingBox = box;
-            OnPropertyChanged("Node");
+            GeometryNode.BoundingBox = box;
+            OnPropertyChanged("GeometryNode");
             Relayout();
         }
 
@@ -130,8 +136,8 @@ namespace Mindmappy.Shared
         {
             e.Handled = true;
             var delta = new MSAGLPoint(e.Delta.Translation.X, e.Delta.Translation.Y);
-            Node.Center += delta;
-            OnPropertyChanged("Node");
+            GeometryNode.Center += delta;
+            OnPropertyChanged("GeometryNode");
             OnPropertyChanged("Pos");
             Relayout();
         }
@@ -140,9 +146,10 @@ namespace Mindmappy.Shared
         {
             e.Handled = true;
             Controller.UnfocusAll();
-            if (ParentPage.CursorEdge != null)
+            if (Controller.EdgeFromNode != null)
             {
-                ParentPage.AttachEdge(this);
+                Controller.CreateEdge(Controller.EdgeFromNode.Node.Id, Node.Id);
+                Controller.EdgeFromNode = null;
             }
             else
             {
@@ -152,23 +159,23 @@ namespace Mindmappy.Shared
 
         void RemoveButton_Click(object sender, RoutedEventArgs e)
         {
-            Controller.GeometryGraph.Nodes.Remove(Node);
+            Controller.GeometryGraph.Nodes.Remove(GeometryNode);
             Relayout();
             ParentPage.Canvas.Children.Remove(this);
         }
 
-        void AddEdgeButton_Click(object sender, TappedRoutedEventArgs e)
+        void AddEdgeButton_Tapped(object sender, TappedRoutedEventArgs e)
         {
             e.Handled = true;
-            ParentPage.AddCursorNode(this);
+            Controller.EdgeFromNode = this;
         }
 
         public void Relayout()
         {
             var layout = new Relayout(
                 Controller.GeometryGraph,
-                new Node[] { Node },
-                new Node[] { },
+                new MSAGLNode[] { GeometryNode },
+                new MSAGLNode[] { },
                 (cluster) => Controller.LayoutSettings
             );
             layout.Run();

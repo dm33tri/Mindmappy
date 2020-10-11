@@ -9,18 +9,18 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d android"
     DataContext="{Binding RelativeSource={RelativeSource Self}}" 
-    Canvas.Left="{Binding Path=Node.BoundingBox.Left}"
-    Canvas.Top="{Binding Path=Node.BoundingBox.Bottom}"
+    Canvas.Left="{Binding Path=GeometryNode.BoundingBox.Left}"
+    Canvas.Top="{Binding Path=GeometryNode.BoundingBox.Bottom}"
     ManipulationMode="TranslateX,TranslateY"
     Canvas.ZIndex="2">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="{Binding Path=Node.BoundingBox.Width}" />
+            <ColumnDefinition Width="{Binding Path=GeometryNode.BoundingBox.Width}" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <Rectangle x:Name="background" 
-            Width="{Binding Path=Node.BoundingBox.Width}"
-            Height="{Binding Path=Node.BoundingBox.Height}" 
+            Width="{Binding Path=GeometryNode.BoundingBox.Width}"
+            Height="{Binding Path=GeometryNode.BoundingBox.Height}" 
             Fill="White"
             Stroke="{Binding Path=Stroke}"
             StrokeThickness="3"
@@ -29,8 +29,8 @@
             HorizontalAlignment="Stretch" />
         <TextBox
             x:Name="textBox"
-            Width="{Binding Path=Node.BoundingBox.Width}"
-            Height="{Binding Path=Node.BoundingBox.Height}"
+            Width="{Binding Path=GeometryNode.BoundingBox.Width}"
+            Height="{Binding Path=GeometryNode.BoundingBox.Height}"
             IsTabStop="False"
             VerticalAlignment="Stretch" 
             HorizontalAlignment="Stretch"
@@ -53,8 +53,8 @@
         </TextBox>
         <Rectangle 
             x:Name="overlay" 
-            Width="{Binding Path=Node.BoundingBox.Width}"
-            Height="{Binding Path=Node.BoundingBox.Height}" 
+            Width="{Binding Path=GeometryNode.BoundingBox.Width}"
+            Height="{Binding Path=GeometryNode.BoundingBox.Height}" 
             Fill="Transparent" 
             VerticalAlignment="Stretch" 
             HorizontalAlignment="Stretch" />

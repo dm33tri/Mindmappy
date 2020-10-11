@@ -8,4 +8,8 @@
   <ItemGroup>
     <Folder Include="Hubs\" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CollabLib\CollabLib.csproj" />
+  </ItemGroup>
 </Project>

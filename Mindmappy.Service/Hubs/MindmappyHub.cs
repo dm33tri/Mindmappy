@@ -1,45 +1,39 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Linq;
-using System;
+using CollabLib;
 
 namespace Mindmappy.Service.Hubs
 {
     public static class Shared
     {
-        public static HashSet<string> ConnectedIds = new HashSet<string>();
+        public static Document doc = new Document();
+
+       static Shared()
+        {
+            doc.AddArray("nodes");
+            doc.AddArray("edges");
+        }
     }
     public class MindmappyHub : Hub
     {
         public override Task OnConnectedAsync()
         {
-            if (Shared.ConnectedIds.Count > 0)
-            {
-                Clients.Others.SendAsync("NewUser", Context.ConnectionId);
-            } 
-            else
-            {
-                Clients.Client(Context.ConnectionId).SendAsync("First");
-            }
-            Shared.ConnectedIds.Add(Context.ConnectionId);
+            Clients.Client(Context.ConnectionId).SendAsync("Update", Shared.doc.EncodeState());
             return base.OnConnectedAsync();
-        }
-
-        public override Task OnDisconnectedAsync(Exception exception)
-        {
-            Shared.ConnectedIds.Remove(Context.ConnectionId);
-            return base.OnDisconnectedAsync(exception);
-        }
-
-        public void NewUser(string id, byte[] message)
-        {
-            Clients.Client(id).SendAsync("Update", message);
         }
 
         public void Update(byte[] message)
         {
             Clients.Others.SendAsync("Update", message);
+            Shared.doc.ApplyUpdate(message);
+        }
+
+        public void Reset()
+        {
+            Shared.doc = new Document();
+            Shared.doc.AddArray("nodes");
+            Shared.doc.AddArray("edges");
+            Clients.All.SendAsync("Reset");
         }
     }
 }

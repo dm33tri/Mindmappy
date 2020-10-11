@@ -22,11 +22,17 @@ namespace Mindmappy.Shared
         {
             this.InitializeComponent();
             addNodeButton.Tapped += AddNodeButton_Tapped;
+            saveAsSvgButton.Tapped += SaveAsSvgButton_Tapped;
         }
 
         private void AddNodeButton_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            Controller.AddNode();
+            Controller.CreateNode();
+        }
+
+        private void SaveAsSvgButton_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            Controller.WriteGraph();
         }
     }
 }
