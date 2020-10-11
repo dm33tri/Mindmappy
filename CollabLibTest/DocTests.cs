@@ -268,5 +268,25 @@ namespace CollabLib.Tests
 
             Assert.Equal("node2", (node2_2.Get("text") as Text).ToString());
         }
+
+        [Fact]
+        public void DeleteText()
+        {
+            Document doc0 = new Document();
+            Document doc1 = new Document();
+
+            doc0.Update += (doc, data) =>
+            {
+                doc1.ApplyUpdate(data);
+            };
+
+            Text text0 = doc0.GetText("text");
+            Text text1 = doc1.GetText("text");
+            text0.InsertText(0, "Hell world!");
+            text0.InsertText(4, "o,");
+            text0.DeleteText(2, 3);
+            text0.InsertText(2, "y");
+            Assert.Equal("Hey, world!", text0.ToString());
+        }
     }
 }

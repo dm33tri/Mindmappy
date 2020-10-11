@@ -24,10 +24,51 @@ namespace Mindmappy.Shared
             Style = SKPaintStyle.Fill
         };
 
+
+        SKPaint selectedLinePaint = new SKPaint
+        {
+            Color = SKColors.Blue,
+            Style = SKPaintStyle.Stroke,
+            StrokeWidth = 3
+        };
+
+        SKPaint selectedArrowPaint = new SKPaint
+        {
+            Color = SKColors.Blue,
+            Style = SKPaintStyle.Fill
+        };
+
         public EdgesSurface()
         {
             InitializeComponent();
             AnimationLoop();
+            this.Tapped += EdgesSurface_Tapped;
+        }
+
+        private bool HitDetect(Point point, Edge edge)
+        {
+            ICurve curve = edge.Curve;
+            Point closest = Curve.ClosestPoint(curve, point);
+            double length = (point - closest).Length;
+            return length < 8;
+        }
+
+        private void EdgesSurface_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
+        {
+            var p = e.GetPosition(this);
+            Point point = new Point(p.X, p.Y);
+            var graph = Controller?.Graph;
+            if (graph == null)
+            {
+                return;
+            }
+            foreach (var edge in graph.Edges)
+            {
+                if (HitDetect(point, edge.GeometryEdge))
+                {
+                    Controller.SelectedEdge = edge;
+                }
+            }
         }
 
         SKPoint P(Point p)
@@ -35,7 +76,7 @@ namespace Mindmappy.Shared
             return new SKPoint((float)p.X, (float)p.Y);
         }
 
-        void DrawArrowhead(SKCanvas canvas, Point from, Point to)
+        void DrawArrowhead(SKCanvas canvas, Point from, Point to, SKPaint paint)
         {
             Point dir = to - from;
             Point h = new Point(-dir.Y, dir.X);
@@ -51,7 +92,7 @@ namespace Mindmappy.Shared
                 path.LineTo(P(p2));
                 path.LineTo(P(to));
                 path.Close();
-                canvas.DrawPath(path, arrowPaint);
+                canvas.DrawPath(path, paint);
             }
         }
 
@@ -64,6 +105,7 @@ namespace Mindmappy.Shared
             }
             foreach (Edge edge in graph.Edges)
             {
+                bool selected = Controller.SelectedEdge?.GeometryEdge == edge;
                 var curve = edge.Curve;
 
                 if (curve is Curve)
@@ -74,7 +116,7 @@ namespace Mindmappy.Shared
                         if (segment is LineSegment)
                         {
                             var s = segment as LineSegment;
-                            canvas.DrawLine(P(s[0]), P(s[1]), linePaint);
+                            canvas.DrawLine(P(s[0]), P(s[1]), selected ? selectedLinePaint : linePaint);
                         }
                         else if (segment is CubicBezierSegment)
                         {
@@ -83,7 +125,7 @@ namespace Mindmappy.Shared
                             {
                                 path.MoveTo(P(s.B(0)));
                                 path.CubicTo(P(s.B(1)), P(s.B(2)), P(s.B(3)));
-                                canvas.DrawPath(path, linePaint);
+                                canvas.DrawPath(path, selected ? selectedLinePaint : linePaint);
                             }
                         }
                     }
@@ -91,15 +133,15 @@ namespace Mindmappy.Shared
                 else if (curve is LineSegment)
                 {
                     var s = curve as LineSegment;
-                    canvas.DrawLine(P(s[0]), P(s[1]), linePaint);
+                    canvas.DrawLine(P(s[0]), P(s[1]), selected ? selectedLinePaint : linePaint);
                 }
                 if (edge.ArrowheadAtSource)
                 {
-                    DrawArrowhead(canvas, edge.Curve.Start, edge.EdgeGeometry.SourceArrowhead.TipPosition);
+                    DrawArrowhead(canvas, edge.Curve.Start, edge.EdgeGeometry.SourceArrowhead.TipPosition, selected ? selectedArrowPaint : arrowPaint);
                 }
                 if (edge.ArrowheadAtTarget)
                 {
-                    DrawArrowhead(canvas, edge.Curve.End, edge.EdgeGeometry.TargetArrowhead.TipPosition);
+                    DrawArrowhead(canvas, edge.Curve.End, edge.EdgeGeometry.TargetArrowhead.TipPosition, selected ? selectedArrowPaint : arrowPaint);
                 }
             }
         }

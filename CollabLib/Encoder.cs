@@ -1,5 +1,4 @@
 ﻿using CollabLib.Content;
-using CollabLib.Struct;
 using System;
 using System.Collections.Generic;
 using System.Text;

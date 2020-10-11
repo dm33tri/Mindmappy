@@ -191,10 +191,6 @@ namespace CollabLib
         {
             if (!deleted)
             {
-                if (countable && parentKey == null)
-                {
-                    parent.length -= length;
-                }
                 deleted = true;
 
                 transaction.SetDeleted(this);

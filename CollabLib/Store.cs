@@ -179,7 +179,7 @@ namespace CollabLib
                         PendingRefs pendingRefs;
                         if (pendingClientRefs.TryGetValue(missing.client, out pendingRefs))
                         {
-                            pendingStack.Add(pendingRefs.refs[pendingRefs.i++]);
+                            pendingStack.Add(pendingRefs.refs[pendingRefs.i]);
                             if (pendingRefs.i == pendingRefs.refs.Count)
                             {
                                 pendingClientRefs.Remove(missing.client);

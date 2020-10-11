@@ -17,9 +17,16 @@ namespace Mindmappy.Shared
 {
     public sealed partial class BottomMenu : Page
     {
+        public Controller Controller { get; set; }
         public BottomMenu()
         {
             this.InitializeComponent();
+            addNodeButton.Tapped += AddNodeButton_Tapped;
+        }
+
+        private void AddNodeButton_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            Controller.AddNode();
         }
     }
 }

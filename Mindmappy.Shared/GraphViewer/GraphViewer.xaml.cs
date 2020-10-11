@@ -109,9 +109,7 @@ namespace Mindmappy
             canvas.Tapped += OnResetFocus;
             canvas.Tapped += OnTapped;
             mainGrid.SizeChanged += MainGrid_SizeChanged;
-            // TODO
-            //addNodeButton.Click += AddNode;
-            //removeEdgeButton.Click += RemoveEdge;
+            bottomMenu.Controller = Controller;
         }
 
         async Task GetImagePath()
@@ -175,16 +173,6 @@ namespace Mindmappy
                 CanvasWidth = mainGrid.ActualWidth;
                 CanvasHeight = mainGrid.ActualHeight;
             }
-        }
-
-        public void AddNode(object sender, RoutedEventArgs e)
-        {
-            //var node = new MSAGLNode(
-            //    CurveFactory.CreateRectangle(150, 60, new MSAGLPoint(canvas.Width / 2, canvas.Height / 2)),
-            //    graph.Nodes.Count
-            //);
-            //graph.RootCluster.AddChild(node);
-            //new UINode(node, this, graph, layoutSettings, cancelToken).Focus();
         }
 
         public void RemoveEdge(object sender, RoutedEventArgs e)

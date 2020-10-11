@@ -47,7 +47,6 @@ namespace Mindmappy.Service
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapRazorPages();
                 endpoints.MapHub<Hubs.MindmappyHub>("/mindmappy");
             });
         }

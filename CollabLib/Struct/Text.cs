@@ -85,24 +85,99 @@ namespace CollabLib.Struct
 
         public void Diff(string newText)
         {
-            var curr = ToString();
-            int start = curr.Length;
-            for (int i = 0; i < curr.Length; ++i)
+            if (newText.Length > length) // insert
             {
-                if (newText[i] != curr[i])
+                var curr = ToString();
+                int start = curr.Length;
+                for (int i = 0; i < curr.Length; ++i)
                 {
-                    start = i;
-                    break;
+                    if (newText[i] != curr[i])
+                    {
+                        start = i;
+                        break;
+                    }
                 }
+                var len = newText.Length - curr.Length;
+                var diff = newText.Substring(start, len);
+                InsertText(start, diff);
+            } 
+            else if (newText.Length < length) // delete
+            {
+                var curr = ToString();
+                int start = curr.Length;
+                for (int i = 0; i < newText.Length; ++i)
+                {
+                    if (newText[i] != curr[i])
+                    {
+                        start = i;
+                        break;
+                    }
+                }
+                var len = curr.Length - newText.Length;
+                DeleteText(start, len);
             }
-            var len = newText.Length - curr.Length;
-            var diff = newText.Substring(start, len);
-            InsertText(start, diff);
         }
 
-        public void Delete(int index, int length)
+        public void DeleteTextFunc(int index, int length, Transaction transaction)
         {
+            Item left = null, right = null; ;
+            if (index != 0) // find left
+            {
+                left = start;
 
+                for (; left != null && index > 0; left = left.right)
+                {
+                    if (!left.deleted && left.countable)
+                    {
+                        if (index <= left.length)
+                        {
+                            // split item
+                            if (index < left.length)
+                            {
+                                transaction.doc.store.GetItemCleanStart(transaction, new ID(left.id.client, left.id.clock + index));
+                            }
+                            right = left.right;
+                            break;
+                        }
+
+                        index -= left.length;
+                    }
+                }
+            }
+
+            for (; right != null && length > 0; right = right.right)
+            {
+                if (!right.deleted && right.countable)
+                {
+                    if (length <= right.length)
+                    {
+                        if (length < right.length)
+                        {
+                            transaction.doc.store.GetItemCleanStart(transaction, new ID(right.id.client, right.id.clock + length));
+                        }
+                        break;
+                    }
+                    right.Delete(transaction);
+                    length -= right.length;
+                }
+            }
+
+            right?.Delete(transaction);
+            this.length -= right?.length ?? 0;
+
+            if (left != null)
+            {
+                Item newRight = right?.right;
+                left.right = newRight;
+            }
+        }
+
+        public void DeleteText(int index, int length)
+        {
+            doc.Transact((transaction) =>
+            {
+                DeleteTextFunc(index, length, transaction);
+            });
         }
 
         public const int ContentTypeRef = 2;

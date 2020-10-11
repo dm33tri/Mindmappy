@@ -9,22 +9,22 @@
     <StackPanel Orientation="Horizontal" Grid.Row="1">
         <AppBarButton x:Name="addNodeButton" Label="Добавить вершину">
             <AppBarButton.Icon>
-                <FontIcon FontFamily="Segoe MDL 2" Glyph="&#xE710;"/>
+                <FontIcon FontFamily="Segoe MDL 2" Glyph="➕"/>
             </AppBarButton.Icon>
         </AppBarButton>
         <AppBarButton Visibility="Collapsed" x:Name="addEdgeButton" Label="Добавить ребро">
             <AppBarButton.Icon>
-                <FontIcon FontFamily="Segoe MDL 2" Glyph="&#xE71B;"/>
+                <FontIcon FontFamily="Segoe MDL 2" Glyph="🔗"/>
             </AppBarButton.Icon>
         </AppBarButton>
         <AppBarButton Visibility="Collapsed" x:Name="removeNodeButton" Label="Удалить вершину">
             <AppBarButton.Icon>
-                <FontIcon FontFamily="Segoe MDL 2" Glyph="&#xE894;"/>
+                <FontIcon FontFamily="Segoe MDL 2" Glyph="❌"/>
             </AppBarButton.Icon>
         </AppBarButton>
         <AppBarButton Visibility="{Binding Path=IsEdgeSelected}" x:Name="removeEdgeButton" Label="Удалить ребро">
             <AppBarButton.Icon>
-                <FontIcon FontFamily="Segoe MDL 2" Glyph="&#59540;"/>
+                <FontIcon FontFamily="Segoe MDL 2" Glyph="❌"/>
             </AppBarButton.Icon>
         </AppBarButton>
     </StackPanel>

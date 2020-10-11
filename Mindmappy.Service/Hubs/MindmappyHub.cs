@@ -16,7 +16,7 @@ namespace Mindmappy.Service.Hubs
         {
             if (Shared.ConnectedIds.Count > 0)
             {
-                Clients.Client(Shared.ConnectedIds.First()).SendAsync("NewUser", Context.ConnectionId);
+                Clients.Others.SendAsync("NewUser", Context.ConnectionId);
             } 
             else
             {

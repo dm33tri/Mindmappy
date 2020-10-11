@@ -27,13 +27,19 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <local:EdgesSurface x:Name="edgesSurface" />
             <Canvas 
                 x:Name="canvas"
                 Background="Transparent" 
                 Width="{Binding Path=CanvasWidth}"
-                Height="{Binding Path=CanvasHeight}" />
+                Height="{Binding Path=CanvasHeight}">
+                <local:EdgesSurface 
+                    Canvas.Left="0" 
+                    Canvas.Top="0" 
+                    Width="{Binding Path=CanvasWidth}"
+                    Height="{Binding Path=CanvasHeight}"
+                    x:Name="edgesSurface" />
+            </Canvas>
         </Grid>
-        <local:BottomMenu Grid.Row="1" />
+        <local:BottomMenu Grid.Row="1" x:Name="bottomMenu" />
     </Grid>
 </Page>
